@@ -209,6 +209,7 @@ function toCard(t: ScoredTask): TaskCardData {
     review_status: t.review_status ?? "pending",
     score: t.score,
     is_overdue: !!t.is_overdue,
+    recurrence: t.recurrence ?? "one_off",
   };
 }
 
