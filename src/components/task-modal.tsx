@@ -175,6 +175,17 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
           <Field label="Deadline">
             <Input type="date" value={form.deadline ?? ""} onChange={(e) => set("deadline", e.target.value || null)} />
           </Field>
+          <Field label="Recorrência">
+            <Select value={(form.recurrence as string) ?? "one_off"} onValueChange={(v) => set("recurrence", v as any)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="one_off">Esporádica</SelectItem>
+                <SelectItem value="daily">Diária</SelectItem>
+                <SelectItem value="weekly">Semanal</SelectItem>
+                <SelectItem value="monthly">Mensal</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
           <Field label="Responsável">
             <Select value={form.assignee_id} onValueChange={(v) => set("assignee_id", v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
