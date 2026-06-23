@@ -308,6 +308,7 @@ export type Database = {
           is_overdue: boolean | null
           needs_review: boolean | null
           position: number | null
+          recurrence: Database["public"]["Enums"]["task_recurrence"] | null
           review_status: Database["public"]["Enums"]["review_status"] | null
           reviewer_id: string | null
           s_confidence_n: number | null
@@ -342,6 +343,7 @@ export type Database = {
           is_overdue?: never
           needs_review?: boolean | null
           position?: number | null
+          recurrence?: Database["public"]["Enums"]["task_recurrence"] | null
           review_status?: Database["public"]["Enums"]["review_status"] | null
           reviewer_id?: string | null
           s_confidence_n?: never
@@ -376,6 +378,7 @@ export type Database = {
           is_overdue?: never
           needs_review?: boolean | null
           position?: number | null
+          recurrence?: Database["public"]["Enums"]["task_recurrence"] | null
           review_status?: Database["public"]["Enums"]["review_status"] | null
           reviewer_id?: string | null
           s_confidence_n?: never
