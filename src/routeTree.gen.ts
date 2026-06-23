@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated/overview'
+import { Route as AuthenticatedTasksUserIdRouteImport } from './routes/_authenticated/tasks.$userId'
 import { Route as ApiPublicSnapshotsRunRouteImport } from './routes/api/public/snapshots/run'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -28,6 +29,12 @@ const AuthenticatedOverviewRoute = AuthenticatedOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTasksUserIdRoute =
+  AuthenticatedTasksUserIdRouteImport.update({
+    id: '/tasks/$userId',
+    path: '/tasks/$userId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
   id: '/api/public/snapshots/run',
   path: '/api/public/snapshots/run',
@@ -37,11 +44,13 @@ const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/overview': typeof AuthenticatedOverviewRoute
+  '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
   '/api/public/snapshots/run': typeof ApiPublicSnapshotsRunRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/overview': typeof AuthenticatedOverviewRoute
+  '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
   '/api/public/snapshots/run': typeof ApiPublicSnapshotsRunRoute
 }
 export interface FileRoutesById {
@@ -49,18 +58,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/overview': typeof AuthenticatedOverviewRoute
+  '/_authenticated/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
   '/api/public/snapshots/run': typeof ApiPublicSnapshotsRunRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/overview' | '/api/public/snapshots/run'
+  fullPaths: '/' | '/overview' | '/tasks/$userId' | '/api/public/snapshots/run'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/overview' | '/api/public/snapshots/run'
+  to: '/' | '/overview' | '/tasks/$userId' | '/api/public/snapshots/run'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/_authenticated/overview'
+    | '/_authenticated/tasks/$userId'
     | '/api/public/snapshots/run'
   fileRoutesById: FileRoutesById
 }
@@ -93,6 +104,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOverviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tasks/$userId': {
+      id: '/_authenticated/tasks/$userId'
+      path: '/tasks/$userId'
+      fullPath: '/tasks/$userId'
+      preLoaderRoute: typeof AuthenticatedTasksUserIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/snapshots/run': {
       id: '/api/public/snapshots/run'
       path: '/api/public/snapshots/run'
@@ -105,10 +123,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
+  AuthenticatedTasksUserIdRoute: typeof AuthenticatedTasksUserIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
+  AuthenticatedTasksUserIdRoute: AuthenticatedTasksUserIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
