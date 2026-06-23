@@ -11,6 +11,13 @@ const URGENCY_STYLE: Record<string, string> = {
   critical: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
+const RECURRENCE_LABEL: Record<string, string> = {
+  one_off: "esporádica",
+  daily: "diária",
+  weekly: "semanal",
+  monthly: "mensal",
+};
+
 export interface TaskCardData {
   id: string;
   title: string;
@@ -23,6 +30,7 @@ export interface TaskCardData {
   review_status: string;
   score: number | string | null;
   is_overdue: boolean;
+  recurrence?: string | null;
 }
 
 export function TaskCard({ task, onClick }: { task: TaskCardData; onClick?: () => void }) {
@@ -54,6 +62,11 @@ export function TaskCard({ task, onClick }: { task: TaskCardData; onClick?: () =
         </span>
         {task.impacts_margin && (
           <span className="rounded border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">margem</span>
+        )}
+        {task.recurrence && task.recurrence !== "one_off" && (
+          <span className="rounded border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:text-violet-300">
+            {RECURRENCE_LABEL[task.recurrence] ?? task.recurrence}
+          </span>
         )}
         {task.is_blocked && (
           <span className="inline-flex items-center gap-1 rounded border border-destructive/30 bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">

@@ -165,7 +165,7 @@ function TasksPage() {
                       <TaskCard
                         key={t.id}
                         task={toCard(t)}
-                        onClick={() => setEditing(t as Task)}
+                        onClick={() => setEditing(t as unknown as Task)}
                       />
                     ))}
                     {items.length === 0 && (
@@ -209,6 +209,7 @@ function toCard(t: ScoredTask): TaskCardData {
     review_status: t.review_status ?? "pending",
     score: t.score,
     is_overdue: !!t.is_overdue,
+    recurrence: t.recurrence ?? "one_off",
   };
 }
 
