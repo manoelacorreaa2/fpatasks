@@ -178,6 +178,7 @@ export type Database = {
           is_blocked: boolean
           needs_review: boolean
           position: number
+          recurrence: Database["public"]["Enums"]["task_recurrence"]
           review_status: Database["public"]["Enums"]["review_status"]
           reviewer_id: string | null
           status: Database["public"]["Enums"]["task_status"]
@@ -204,6 +205,7 @@ export type Database = {
           is_blocked?: boolean
           needs_review?: boolean
           position?: number
+          recurrence?: Database["public"]["Enums"]["task_recurrence"]
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewer_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
@@ -230,6 +232,7 @@ export type Database = {
           is_blocked?: boolean
           needs_review?: boolean
           position?: number
+          recurrence?: Database["public"]["Enums"]["task_recurrence"]
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewer_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
@@ -426,6 +429,7 @@ export type Database = {
       impact_type: "revenue" | "cost_reduction" | "margin_pct"
       review_status: "pending" | "requested" | "approved" | "changes_requested"
       snapshot_scope: "team" | "user"
+      task_recurrence: "one_off" | "daily" | "weekly" | "monthly"
       task_status: "todo" | "doing" | "done"
       task_urgency: "low" | "medium" | "high" | "critical"
     }
@@ -559,6 +563,7 @@ export const Constants = {
       impact_type: ["revenue", "cost_reduction", "margin_pct"],
       review_status: ["pending", "requested", "approved", "changes_requested"],
       snapshot_scope: ["team", "user"],
+      task_recurrence: ["one_off", "daily", "weekly", "monthly"],
       task_status: ["todo", "doing", "done"],
       task_urgency: ["low", "medium", "high", "critical"],
     },
