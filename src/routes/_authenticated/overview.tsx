@@ -175,12 +175,13 @@ function Overview() {
               <p className="text-sm text-muted-foreground">Sem tarefas ainda.</p>
             ) : (
               topTasks.map((t) => {
-                const owner = profileById[t.assignee_id];
+                const aid = t.assignee_id ?? "";
+                const owner = profileById[aid];
                 return (
                   <Link
                     key={t.id}
                     to="/tasks/$userId"
-                    params={{ userId: t.assignee_id }}
+                    params={{ userId: aid }}
                     className="flex items-center justify-between rounded-md border p-3 hover:bg-accent/40"
                   >
                     <div className="min-w-0 flex-1">
@@ -206,18 +207,19 @@ function Overview() {
               <p className="text-sm text-muted-foreground">Nenhuma tarefa crítica aberta. 🎉</p>
             ) : (
               critical.map((t) => {
+                const aid = t.assignee_id ?? "";
                 const d = daysUntil(t.deadline);
                 return (
                   <Link
                     key={t.id}
                     to="/tasks/$userId"
-                    params={{ userId: t.assignee_id }}
+                    params={{ userId: aid }}
                     className="flex items-center justify-between rounded-md border border-destructive/30 bg-destructive/5 p-3 hover:bg-destructive/10"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-medium">{t.title}</div>
                       <div className="text-xs text-muted-foreground">
-                        {profileById[t.assignee_id]?.full_name ?? "—"} • {t.urgency}
+                        {profileById[aid]?.full_name ?? "—"} • {t.urgency}
                         {d != null && (d < 0 ? ` • ${Math.abs(d)}d atrasada` : d <= 7 ? ` • em ${d}d` : "")}
                       </div>
                     </div>
