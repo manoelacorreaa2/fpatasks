@@ -1,0 +1,1 @@
+ALTER VIEW public.tasks_with_score SET (security_invoker = true);
