@@ -13,6 +13,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated/overview'
 import { Route as AuthenticatedTasksUserIdRouteImport } from './routes/_authenticated/tasks.$userId'
+import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
 import { Route as ApiPublicSnapshotsRunRouteImport } from './routes/api/public/snapshots/run'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -35,6 +36,12 @@ const AuthenticatedTasksUserIdRoute =
     path: '/tasks/$userId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminMembersRoute =
+  AuthenticatedAdminMembersRouteImport.update({
+    id: '/admin/members',
+    path: '/admin/members',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
   id: '/api/public/snapshots/run',
   path: '/api/public/snapshots/run',
@@ -44,12 +51,14 @@ const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/overview': typeof AuthenticatedOverviewRoute
+  '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
   '/api/public/snapshots/run': typeof ApiPublicSnapshotsRunRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/overview': typeof AuthenticatedOverviewRoute
+  '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
   '/api/public/snapshots/run': typeof ApiPublicSnapshotsRunRoute
 }
@@ -58,19 +67,31 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/overview': typeof AuthenticatedOverviewRoute
+  '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
   '/api/public/snapshots/run': typeof ApiPublicSnapshotsRunRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/overview' | '/tasks/$userId' | '/api/public/snapshots/run'
+  fullPaths:
+    | '/'
+    | '/overview'
+    | '/admin/members'
+    | '/tasks/$userId'
+    | '/api/public/snapshots/run'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/overview' | '/tasks/$userId' | '/api/public/snapshots/run'
+  to:
+    | '/'
+    | '/overview'
+    | '/admin/members'
+    | '/tasks/$userId'
+    | '/api/public/snapshots/run'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/_authenticated/overview'
+    | '/_authenticated/admin/members'
     | '/_authenticated/tasks/$userId'
     | '/api/public/snapshots/run'
   fileRoutesById: FileRoutesById
@@ -111,6 +132,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTasksUserIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/members': {
+      id: '/_authenticated/admin/members'
+      path: '/admin/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AuthenticatedAdminMembersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/snapshots/run': {
       id: '/api/public/snapshots/run'
       path: '/api/public/snapshots/run'
@@ -123,11 +151,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
+  AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
   AuthenticatedTasksUserIdRoute: typeof AuthenticatedTasksUserIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
+  AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
   AuthenticatedTasksUserIdRoute: AuthenticatedTasksUserIdRoute,
 }
 

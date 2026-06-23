@@ -77,7 +77,7 @@ function AdminMembers() {
   const handleSnapshot = async () => {
     setSnapPending(true);
     try {
-      const res = await runSnap({ data: {} });
+      const res = await runSnap();
       if (res.ok) toast.success(`Snapshot gerado (${res.inserted} linhas)`);
       else toast.error(res.error ?? "Falha");
     } finally { setSnapPending(false); }
