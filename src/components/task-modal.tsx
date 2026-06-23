@@ -50,6 +50,7 @@ const empty = (assigneeId: string, currentUserId: string): TaskInsert => ({
   review_status: "pending",
   is_blocked: false,
   blocked_reason: "",
+  recurrence: "one_off",
 });
 
 export function TaskModal({ open, onClose, task, assigneeId, currentUserId, profiles }: Props) {
