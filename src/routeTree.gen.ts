@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated/overview'
@@ -16,6 +17,11 @@ import { Route as AuthenticatedTasksUserIdRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
 import { Route as ApiPublicSnapshotsRunRouteImport } from './routes/api/public/snapshots/run'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -50,6 +56,7 @@ const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/overview': typeof AuthenticatedOverviewRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/overview': typeof AuthenticatedOverviewRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -66,6 +74,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/_authenticated/overview': typeof AuthenticatedOverviewRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -75,6 +84,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/overview'
     | '/admin/members'
     | '/tasks/$userId'
@@ -82,6 +92,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/overview'
     | '/admin/members'
     | '/tasks/$userId'
@@ -90,6 +101,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/auth'
     | '/_authenticated/overview'
     | '/_authenticated/admin/members'
     | '/_authenticated/tasks/$userId'
@@ -99,11 +111,19 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ApiPublicSnapshotsRunRoute: typeof ApiPublicSnapshotsRunRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -167,6 +187,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ApiPublicSnapshotsRunRoute: ApiPublicSnapshotsRunRoute,
 }
 export const routeTree = rootRouteImport
