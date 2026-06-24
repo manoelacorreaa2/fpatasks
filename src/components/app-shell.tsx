@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, LogOut, Shield, ListChecks } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, Shield, ListChecks, History } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
@@ -67,6 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <nav className="flex flex-col gap-1">
           {navItem("/overview", "Overview", LayoutDashboard, pathname === "/overview")}
           {user && navItem(`/tasks/${user.id}`, "Minhas tarefas", ListChecks, pathname.startsWith("/tasks/") && pathname.includes(user.id))}
+          {navItem("/historico", "Histórico", History, pathname === "/historico")}
           <div className="mt-3 px-3 text-xs uppercase tracking-wide text-muted-foreground">Equipe</div>
           {profiles.map((p) =>
             navItem(
