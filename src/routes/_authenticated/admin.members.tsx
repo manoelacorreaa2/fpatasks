@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { initials } from "@/lib/format";
-import { inviteMember, setMemberActive } from "@/lib/members.functions";
+import { inviteMember, setMemberActive, setMemberRole } from "@/lib/members.functions";
 import { runSnapshotNow } from "@/lib/snapshots.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/members")({
@@ -36,6 +36,7 @@ function AdminMembers() {
   const [fullName, setFullName] = useState("");
   const invite = useServerFn(inviteMember);
   const setActive = useServerFn(setMemberActive);
+  const setRole = useServerFn(setMemberRole);
   const runSnap = useServerFn(runSnapshotNow);
   const [pending, setPending] = useState(false);
   const [snapPending, setSnapPending] = useState(false);
@@ -49,6 +50,15 @@ function AdminMembers() {
         .order("created_at");
       if (error) throw error;
       return data ?? [];
+    },
+  });
+
+  const adminsQ = useQuery({
+    queryKey: ["admin_user_ids"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
+      if (error) throw error;
+      return new Set((data ?? []).map((r) => r.user_id));
     },
   });
 
@@ -71,6 +81,12 @@ function AdminMembers() {
   const toggle = async (id: string, active: boolean) => {
     const res = await setActive({ data: { userId: id, active } });
     if (res.ok) { toast.success(active ? "Membro ativado" : "Membro desativado"); qc.invalidateQueries({ queryKey: ["all_members"] }); }
+    else toast.error(res.error ?? "Falha");
+  };
+
+  const toggleAdmin = async (id: string, admin: boolean) => {
+    const res = await setRole({ data: { userId: id, admin } });
+    if (res.ok) { toast.success(admin ? "Promovido a admin" : "Admin removido"); qc.invalidateQueries({ queryKey: ["admin_user_ids"] }); }
     else toast.error(res.error ?? "Falha");
   };
 
@@ -129,9 +145,15 @@ function AdminMembers() {
                   <div className="font-medium">{m.full_name || "—"}</div>
                   <div className="text-xs text-muted-foreground">{m.email}</div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{m.is_active ? "Ativo" : "Inativo"}</span>
-                  <Switch checked={m.is_active} onCheckedChange={(v) => toggle(m.id, v)} />
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Admin</span>
+                    <Switch checked={adminsQ.data?.has(m.id) ?? false} onCheckedChange={(v) => toggleAdmin(m.id, v)} />
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{m.is_active ? "Ativo" : "Inativo"}</span>
+                    <Switch checked={m.is_active} onCheckedChange={(v) => toggle(m.id, v)} />
+                  </label>
                 </div>
               </div>
             ))}
