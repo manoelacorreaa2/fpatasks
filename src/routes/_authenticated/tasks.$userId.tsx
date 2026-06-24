@@ -20,8 +20,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { TaskCard, type TaskCardData } from "@/components/task-card";
 import { TaskModal } from "@/components/task-modal";
-import { useAuth } from "@/hooks/use-auth";
-import { useIsAdmin } from "@/hooks/use-auth";
+import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { fmtUSD, initials } from "@/lib/format";
 import type { Database } from "@/integrations/supabase/types";
 
