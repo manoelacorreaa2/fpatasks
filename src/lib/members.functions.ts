@@ -39,3 +39,29 @@ export const setMemberActive = createServerFn({ method: "POST" })
     if (error) return { ok: false, error: error.message };
     return { ok: true };
   });
+
+const setRoleSchema = z.object({ userId: z.string().uuid(), admin: z.boolean() });
+
+export const setMemberRole = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => setRoleSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) return { ok: false, error: "Apenas administradores." };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.admin) {
+      const { error } = await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: data.userId, role: "admin" }, { onConflict: "user_id,role" });
+      if (error) return { ok: false, error: error.message };
+    } else {
+      if (data.userId === context.userId) return { ok: false, error: "Você não pode remover seu próprio admin." };
+      const { error } = await supabaseAdmin
+        .from("user_roles")
+        .delete()
+        .eq("user_id", data.userId)
+        .eq("role", "admin");
+      if (error) return { ok: false, error: error.message };
+    }
+    return { ok: true };
+  });

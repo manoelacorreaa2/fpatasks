@@ -20,7 +20,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { TaskCard, type TaskCardData } from "@/components/task-card";
 import { TaskModal } from "@/components/task-modal";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { fmtUSD, initials } from "@/lib/format";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -40,6 +40,7 @@ const COLUMNS: { id: "todo" | "doing" | "done"; label: string }[] = [
 function TasksPage() {
   const { userId } = useParams({ from: "/_authenticated/tasks/$userId" });
   const { user } = useAuth();
+  const isAdmin = useIsAdmin(user?.id);
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Task | null>(null);
   const [creating, setCreating] = useState(false);
@@ -148,7 +149,9 @@ function TasksPage() {
         </div>
         <div className="flex gap-2">
           <Input placeholder="Buscar…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-56" />
-          <Button onClick={() => setCreating(true)}><Plus className="mr-1 h-4 w-4" /> Nova tarefa</Button>
+          {(isAdmin || userId === user?.id) && (
+            <Button onClick={() => setCreating(true)}><Plus className="mr-1 h-4 w-4" /> Nova tarefa</Button>
+          )}
         </div>
       </header>
 
@@ -190,6 +193,7 @@ function TasksPage() {
           assigneeId={userId}
           currentUserId={user.id}
           profiles={profilesQ.data ?? []}
+          isAdmin={isAdmin}
         />
       )}
     </div>
