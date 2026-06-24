@@ -28,6 +28,7 @@ interface Props {
   assigneeId: string;
   currentUserId: string;
   profiles: Profile[];
+  isAdmin?: boolean;
 }
 
 const empty = (assigneeId: string, currentUserId: string): TaskInsert => ({
@@ -53,7 +54,7 @@ const empty = (assigneeId: string, currentUserId: string): TaskInsert => ({
   recurrence: "one_off",
 });
 
-export function TaskModal({ open, onClose, task, assigneeId, currentUserId, profiles }: Props) {
+export function TaskModal({ open, onClose, task, assigneeId, currentUserId, profiles, isAdmin = false }: Props) {
   const qc = useQueryClient();
   const [form, setForm] = useState<TaskInsert>(() => empty(assigneeId, currentUserId));
   const requestReviewFn = useServerFn(requestReview);
@@ -187,12 +188,13 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
             </Select>
           </Field>
           <Field label="Responsável">
-            <Select value={form.assignee_id} onValueChange={(v) => set("assignee_id", v)}>
+            <Select value={form.assignee_id} onValueChange={(v) => set("assignee_id", v)} disabled={!isAdmin}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {profiles.map((p) => <SelectItem key={p.id} value={p.id}>{p.full_name || p.email}</SelectItem>)}
               </SelectContent>
             </Select>
+            {!isAdmin && <p className="mt-1 text-[10px] text-muted-foreground">Apenas admins podem reatribuir.</p>}
           </Field>
         </Section>
 
