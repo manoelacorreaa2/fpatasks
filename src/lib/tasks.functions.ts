@@ -79,24 +79,38 @@ export const requestReview = createServerFn({ method: "POST" })
 
     let sendErr: string | undefined;
     try {
-      // Use Lovable Cloud's email via Resend-compatible edge proxy if configured.
-      // For now we attempt a direct fetch to an env-configured endpoint; if not set,
-      // we simulate success in dev but log the failure clearly.
-      const endpoint = process.env.EMAIL_SEND_URL;
-      const apiKey = process.env.EMAIL_API_KEY;
-      if (endpoint && apiKey) {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-          body: JSON.stringify({
-            to: REVIEW_RECIPIENT,
-            subject,
-            html,
-          }),
-        });
-        if (!res.ok) sendErr = `Provider responded ${res.status}: ${await res.text().catch(() => "")}`;
+      const lovableKey = process.env.LOVABLE_API_KEY;
+      const gmailKey = process.env.GOOGLE_MAIL_API_KEY;
+      if (!lovableKey || !gmailKey) {
+        sendErr = "Gmail connector não configurado (LOVABLE_API_KEY/GOOGLE_MAIL_API_KEY ausentes)";
       } else {
-        console.warn("[requestReview] Email provider not configured; logging email instead.", { subject, to: REVIEW_RECIPIENT });
+        const rfc2822 = [
+          `To: ${REVIEW_RECIPIENT}`,
+          `Subject: ${subject}`,
+          "MIME-Version: 1.0",
+          'Content-Type: text/html; charset="UTF-8"',
+          "",
+          html,
+        ].join("\r\n");
+        const raw = btoa(unescape(encodeURIComponent(rfc2822)))
+          .replace(/\+/g, "-")
+          .replace(/\//g, "_")
+          .replace(/=+$/, "");
+        const res = await fetch(
+          "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${lovableKey}`,
+              "X-Connection-Api-Key": gmailKey,
+            },
+            body: JSON.stringify({ raw }),
+          },
+        );
+        if (!res.ok) {
+          sendErr = `Gmail respondeu ${res.status}: ${await res.text().catch(() => "")}`;
+        }
       }
     } catch (e: any) {
       sendErr = e?.message ?? String(e);
