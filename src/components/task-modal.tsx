@@ -83,10 +83,12 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
       if (!form.title?.trim()) throw new Error("Título obrigatório");
       if (form.needs_review && !form.reviewer_id) throw new Error("Selecione um revisor");
       if (task) {
-        const { error } = await supabase.from("tasks").update(form).eq("id", task.id);
+        const { id, score, is_overdue, position, s_reach, s_impact_norm, s_confidence_n, s_effort, s_urgency_mult, s_deadline_mult, created_at, updated_at, completed_at, ...updatable } = form as any;
+        const { error } = await supabase.from("tasks").update(updatable).eq("id", task.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("tasks").insert(form);
+        const { id, score, is_overdue, position, s_reach, s_impact_norm, s_confidence_n, s_effort, s_urgency_mult, s_deadline_mult, created_at, updated_at, completed_at, ...insertable } = form as any;
+        const { error } = await supabase.from("tasks").insert(insertable);
         if (error) throw error;
       }
     },
