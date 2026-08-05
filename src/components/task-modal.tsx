@@ -166,6 +166,7 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
       toast.success(task ? "Tarefa atualizada" : "Tarefa criada");
       qc.invalidateQueries({ queryKey: ["tasks_with_score"] });
       qc.invalidateQueries({ queryKey: ["tasks_by_assignee"] });
+      qc.invalidateQueries({ queryKey: ["dev_history"] });
       onClose();
     },
     onError: (e: Error) => toast.error(e.message),
