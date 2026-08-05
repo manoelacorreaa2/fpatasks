@@ -301,6 +301,150 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
           </Field>
         </Section>
 
+        <Section title="Desenvolvimento">
+          {suggestions.length > 0 && (
+            <div className="col-span-2 space-y-1 rounded-md border border-primary/30 bg-primary/5 p-3">
+              {suggestions.map((s) => (
+                <div key={s} className="flex gap-2 text-xs text-foreground">
+                  <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span>
+                    <b>Sugestão — você decide:</b> {s}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          <Field label="TRM (maturidade)">
+            <ToggleRow options={TRM_OPTIONS} value={(form.trm as Trm) ?? null} onChange={pickTrm} />
+            <p className="mt-1 text-[10px] text-muted-foreground">D1 iniciante · D2 aprendiz · D3 capaz · D4 autônomo</p>
+          </Field>
+          <Field label="Estilo de liderança">
+            <ToggleRow
+              options={STYLE_OPTIONS}
+              value={(form.leadership_style as Style) ?? null}
+              onChange={(v) => setForm((f) => ({ ...f, leadership_style: v, leadership_style_manual: v != null }))}
+            />
+            <p className="mt-1 text-[10px] text-muted-foreground">
+              {form.leadership_style_manual ? "Definido manualmente." : "Sugerido pelo TRM — clique para editar."}
+            </p>
+          </Field>
+          <Field label="Nível de delegação" full>
+            <ToggleRow
+              options={DELEGATION_LEVELS.map((n) => ({ value: n, label: String(n) }))}
+              value={form.delegation_level ?? null}
+              onChange={(v) => set("delegation_level", v)}
+            />
+            <p className="mt-1 text-[10px] text-muted-foreground">{delegationHint(form.delegation_level)}</p>
+          </Field>
+          <Field label={`Definition of Done ${dod.length ? `(${dod.filter((i) => i.done).length}/${dod.length})` : ""}`} full>
+            <div className="space-y-1.5">
+              {dod.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 rounded-md border bg-card px-2 py-1.5">
+                  <Checkbox
+                    checked={item.done}
+                    onCheckedChange={(c) => setDod(dod.map((i) => (i.id === item.id ? { ...i, done: c === true } : i)))}
+                  />
+                  <Input
+                    value={item.text}
+                    onChange={(e) => setDod(dod.map((i) => (i.id === item.id ? { ...i, text: e.target.value } : i)))}
+                    className="h-7 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+                  />
+                  <Button type="button" size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDod(dod.filter((i) => i.id !== item.id))}>
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Adicionar critério…"
+                  value={newCriterion}
+                  onChange={(e) => setNewCriterion(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newCriterion.trim()) {
+                      e.preventDefault();
+                      setDod([...dod, newDodItem(newCriterion.trim())]);
+                      setNewCriterion("");
+                    }
+                  }}
+                  className="h-8"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={!newCriterion.trim()}
+                  onClick={() => {
+                    setDod([...dod, newDodItem(newCriterion.trim())]);
+                    setNewCriterion("");
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    const existing = new Set(dod.map((i) => i.text.toLowerCase()));
+                    const add = suggestDod({
+                      impact_type: form.impact_type as string | null,
+                      recurrence: form.recurrence as string | null,
+                      needs_review: form.needs_review,
+                      expected_output: form.expected_output,
+                    })
+                      .filter((t) => !existing.has(t.toLowerCase()))
+                      .map(newDodItem);
+                    setDod([...dod, ...add]);
+                  }}
+                >
+                  <Lightbulb className="mr-1 h-3.5 w-3.5" /> Sugerir critérios
+                </Button>
+                {previousDod && (
+                  <Button type="button" size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setDod(previousDod)}>
+                    Usar DoD da ocorrência anterior
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Field>
+        </Section>
+
+        {form.status === "done" && (
+          <Section title="Pós-task (obrigatório)">
+            <Field label="Houve retrabalho?">
+              <ToggleRow
+                options={[
+                  { value: "yes", label: "Sim" },
+                  { value: "no", label: "Não" },
+                ]}
+                value={form.rework == null ? null : form.rework ? "yes" : "no"}
+                onChange={(v) => set("rework", v == null ? null : v === "yes")}
+              />
+            </Field>
+            <Field label="Intervenção do gestor?">
+              <ToggleRow
+                options={[
+                  { value: "yes", label: "Sim" },
+                  { value: "no", label: "Não" },
+                ]}
+                value={form.manager_intervention == null ? null : form.manager_intervention ? "yes" : "no"}
+                onChange={(v) => set("manager_intervention", v == null ? null : v === "yes")}
+              />
+            </Field>
+            <Field label="Autonomia percebida" full>
+              <ToggleRow
+                options={[1, 2, 3, 4, 5].map((n) => ({ value: n, label: String(n) }))}
+                value={form.perceived_autonomy ?? null}
+                onChange={(v) => set("perceived_autonomy", v)}
+              />
+              <p className="mt-1 text-[10px] text-muted-foreground">1 = precisou de muito apoio · 5 = totalmente autônomo</p>
+            </Field>
+          </Section>
+        )}
+
         <Section title="Governança">
           <Field label="Precisa de revisão">
             <div className="flex h-9 items-center"><Switch checked={!!form.needs_review} onCheckedChange={(v) => set("needs_review", v)} /></div>
