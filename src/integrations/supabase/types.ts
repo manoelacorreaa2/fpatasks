@@ -168,7 +168,9 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline: string | null
+          delegation_level: number | null
           description: string | null
+          dod: Json
           estimated_hours: number | null
           estimated_impact_usd: number
           expected_output: string | null
@@ -176,13 +178,21 @@ export type Database = {
           impact_type: Database["public"]["Enums"]["impact_type"] | null
           impacts_margin: boolean
           is_blocked: boolean
+          leadership_style:
+            | Database["public"]["Enums"]["leadership_style"]
+            | null
+          leadership_style_manual: boolean
+          manager_intervention: boolean | null
           needs_review: boolean
+          perceived_autonomy: number | null
           position: number
           recurrence: Database["public"]["Enums"]["task_recurrence"]
           review_status: Database["public"]["Enums"]["review_status"]
           reviewer_id: string | null
+          rework: boolean | null
           status: Database["public"]["Enums"]["task_status"]
           title: string
+          trm: Database["public"]["Enums"]["task_trm"] | null
           updated_at: string
           urgency: Database["public"]["Enums"]["task_urgency"]
         }
@@ -195,7 +205,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline?: string | null
+          delegation_level?: number | null
           description?: string | null
+          dod?: Json
           estimated_hours?: number | null
           estimated_impact_usd?: number
           expected_output?: string | null
@@ -203,13 +215,21 @@ export type Database = {
           impact_type?: Database["public"]["Enums"]["impact_type"] | null
           impacts_margin?: boolean
           is_blocked?: boolean
+          leadership_style?:
+            | Database["public"]["Enums"]["leadership_style"]
+            | null
+          leadership_style_manual?: boolean
+          manager_intervention?: boolean | null
           needs_review?: boolean
+          perceived_autonomy?: number | null
           position?: number
           recurrence?: Database["public"]["Enums"]["task_recurrence"]
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewer_id?: string | null
+          rework?: boolean | null
           status?: Database["public"]["Enums"]["task_status"]
           title: string
+          trm?: Database["public"]["Enums"]["task_trm"] | null
           updated_at?: string
           urgency?: Database["public"]["Enums"]["task_urgency"]
         }
@@ -222,7 +242,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline?: string | null
+          delegation_level?: number | null
           description?: string | null
+          dod?: Json
           estimated_hours?: number | null
           estimated_impact_usd?: number
           expected_output?: string | null
@@ -230,13 +252,21 @@ export type Database = {
           impact_type?: Database["public"]["Enums"]["impact_type"] | null
           impacts_margin?: boolean
           is_blocked?: boolean
+          leadership_style?:
+            | Database["public"]["Enums"]["leadership_style"]
+            | null
+          leadership_style_manual?: boolean
+          manager_intervention?: boolean | null
           needs_review?: boolean
+          perceived_autonomy?: number | null
           position?: number
           recurrence?: Database["public"]["Enums"]["task_recurrence"]
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewer_id?: string | null
+          rework?: boolean | null
           status?: Database["public"]["Enums"]["task_status"]
           title?: string
+          trm?: Database["public"]["Enums"]["task_trm"] | null
           updated_at?: string
           urgency?: Database["public"]["Enums"]["task_urgency"]
         }
@@ -297,7 +327,11 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           deadline: string | null
+          delegation_level: number | null
           description: string | null
+          dod: Json | null
+          dod_done: number | null
+          dod_total: number | null
           estimated_hours: number | null
           estimated_impact_usd: number | null
           expected_output: string | null
@@ -306,11 +340,18 @@ export type Database = {
           impacts_margin: boolean | null
           is_blocked: boolean | null
           is_overdue: boolean | null
+          leadership_style:
+            | Database["public"]["Enums"]["leadership_style"]
+            | null
+          leadership_style_manual: boolean | null
+          manager_intervention: boolean | null
           needs_review: boolean | null
+          perceived_autonomy: number | null
           position: number | null
           recurrence: Database["public"]["Enums"]["task_recurrence"] | null
           review_status: Database["public"]["Enums"]["review_status"] | null
           reviewer_id: string | null
+          rework: boolean | null
           s_confidence_n: number | null
           s_deadline_mult: number | null
           s_effort: number | null
@@ -320,6 +361,7 @@ export type Database = {
           score: number | null
           status: Database["public"]["Enums"]["task_status"] | null
           title: string | null
+          trm: Database["public"]["Enums"]["task_trm"] | null
           updated_at: string | null
           urgency: Database["public"]["Enums"]["task_urgency"] | null
         }
@@ -332,7 +374,11 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           deadline?: string | null
+          delegation_level?: number | null
           description?: string | null
+          dod?: Json | null
+          dod_done?: never
+          dod_total?: never
           estimated_hours?: number | null
           estimated_impact_usd?: number | null
           expected_output?: string | null
@@ -341,11 +387,18 @@ export type Database = {
           impacts_margin?: boolean | null
           is_blocked?: boolean | null
           is_overdue?: never
+          leadership_style?:
+            | Database["public"]["Enums"]["leadership_style"]
+            | null
+          leadership_style_manual?: boolean | null
+          manager_intervention?: boolean | null
           needs_review?: boolean | null
+          perceived_autonomy?: number | null
           position?: number | null
           recurrence?: Database["public"]["Enums"]["task_recurrence"] | null
           review_status?: Database["public"]["Enums"]["review_status"] | null
           reviewer_id?: string | null
+          rework?: boolean | null
           s_confidence_n?: never
           s_deadline_mult?: never
           s_effort?: never
@@ -355,6 +408,7 @@ export type Database = {
           score?: never
           status?: Database["public"]["Enums"]["task_status"] | null
           title?: string | null
+          trm?: Database["public"]["Enums"]["task_trm"] | null
           updated_at?: string | null
           urgency?: Database["public"]["Enums"]["task_urgency"] | null
         }
@@ -367,7 +421,11 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           deadline?: string | null
+          delegation_level?: number | null
           description?: string | null
+          dod?: Json | null
+          dod_done?: never
+          dod_total?: never
           estimated_hours?: number | null
           estimated_impact_usd?: number | null
           expected_output?: string | null
@@ -376,11 +434,18 @@ export type Database = {
           impacts_margin?: boolean | null
           is_blocked?: boolean | null
           is_overdue?: never
+          leadership_style?:
+            | Database["public"]["Enums"]["leadership_style"]
+            | null
+          leadership_style_manual?: boolean | null
+          manager_intervention?: boolean | null
           needs_review?: boolean | null
+          perceived_autonomy?: number | null
           position?: number | null
           recurrence?: Database["public"]["Enums"]["task_recurrence"] | null
           review_status?: Database["public"]["Enums"]["review_status"] | null
           reviewer_id?: string | null
+          rework?: boolean | null
           s_confidence_n?: never
           s_deadline_mult?: never
           s_effort?: never
@@ -390,6 +455,7 @@ export type Database = {
           score?: never
           status?: Database["public"]["Enums"]["task_status"] | null
           title?: string | null
+          trm?: Database["public"]["Enums"]["task_trm"] | null
           updated_at?: string | null
           urgency?: Database["public"]["Enums"]["task_urgency"] | null
         }
@@ -430,10 +496,12 @@ export type Database = {
     Enums: {
       app_role: "admin" | "member"
       impact_type: "revenue" | "cost_reduction" | "margin_pct"
+      leadership_style: "s1" | "s2" | "s3" | "s4"
       review_status: "pending" | "requested" | "approved" | "changes_requested"
       snapshot_scope: "team" | "user"
       task_recurrence: "one_off" | "daily" | "weekly" | "monthly"
       task_status: "todo" | "doing" | "done"
+      task_trm: "d1" | "d2" | "d3" | "d4"
       task_urgency: "low" | "medium" | "high" | "critical"
     }
     CompositeTypes: {
@@ -564,10 +632,12 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "member"],
       impact_type: ["revenue", "cost_reduction", "margin_pct"],
+      leadership_style: ["s1", "s2", "s3", "s4"],
       review_status: ["pending", "requested", "approved", "changes_requested"],
       snapshot_scope: ["team", "user"],
       task_recurrence: ["one_off", "daily", "weekly", "monthly"],
       task_status: ["todo", "doing", "done"],
+      task_trm: ["d1", "d2", "d3", "d4"],
       task_urgency: ["low", "medium", "high", "critical"],
     },
   },

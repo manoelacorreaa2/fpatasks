@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated/overview'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
+import { Route as AuthenticatedDesenvolvimentoRouteImport } from './routes/_authenticated/desenvolvimento'
 import { Route as AuthenticatedTasksUserIdRouteImport } from './routes/_authenticated/tasks.$userId'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
 import { Route as ApiPublicSnapshotsRunRouteImport } from './routes/api/public/snapshots/run'
@@ -42,6 +43,12 @@ const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
   path: '/historico',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDesenvolvimentoRoute =
+  AuthenticatedDesenvolvimentoRouteImport.update({
+    id: '/desenvolvimento',
+    path: '/desenvolvimento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTasksUserIdRoute =
   AuthenticatedTasksUserIdRouteImport.update({
     id: '/tasks/$userId',
@@ -63,6 +70,7 @@ const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/overview': typeof AuthenticatedOverviewRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
@@ -72,6 +80,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/overview': typeof AuthenticatedOverviewRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
@@ -83,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/overview': typeof AuthenticatedOverviewRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/desenvolvimento'
     | '/historico'
     | '/overview'
     | '/admin/members'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/desenvolvimento'
     | '/historico'
     | '/overview'
     | '/admin/members'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/desenvolvimento'
     | '/_authenticated/historico'
     | '/_authenticated/overview'
     | '/_authenticated/admin/members'
@@ -164,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/desenvolvimento': {
+      id: '/_authenticated/desenvolvimento'
+      path: '/desenvolvimento'
+      fullPath: '/desenvolvimento'
+      preLoaderRoute: typeof AuthenticatedDesenvolvimentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tasks/$userId': {
       id: '/_authenticated/tasks/$userId'
       path: '/tasks/$userId'
@@ -189,6 +209,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDesenvolvimentoRoute: typeof AuthenticatedDesenvolvimentoRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
@@ -196,6 +217,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDesenvolvimentoRoute: AuthenticatedDesenvolvimentoRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
@@ -214,13 +236,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

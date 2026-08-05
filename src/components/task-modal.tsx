@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, Send, Trash2 } from "lucide-react";
+import { Lightbulb, Loader2, Plus, Send, Trash2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { computeScore, type Urgency } from "@/lib/scoring";
 import { fmtUSD } from "@/lib/format";
 import { requestReview } from "@/lib/tasks.functions";
+import { ToggleRow } from "@/components/toggle-row";
+import {
+  DELEGATION_LEVELS,
+  STYLE_OPTIONS,
+  TRM_OPTIONS,
+  TRM_TO_STYLE,
+  delegationHint,
+  devSuggestions,
+  newDodItem,
+  parseDod,
+  suggestDod,
+  type DodItem,
+  type Style,
+  type Trm,
+} from "@/lib/development";
 import type { Database } from "@/integrations/supabase/types";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
@@ -52,11 +68,20 @@ const empty = (assigneeId: string, currentUserId: string): TaskInsert => ({
   is_blocked: false,
   blocked_reason: "",
   recurrence: "one_off",
+  trm: null,
+  leadership_style: null,
+  leadership_style_manual: false,
+  delegation_level: null,
+  dod: [],
+  rework: null,
+  manager_intervention: null,
+  perceived_autonomy: null,
 });
 
 export function TaskModal({ open, onClose, task, assigneeId, currentUserId, profiles, isAdmin = false }: Props) {
   const qc = useQueryClient();
   const [form, setForm] = useState<TaskInsert>(() => empty(assigneeId, currentUserId));
+  const [newCriterion, setNewCriterion] = useState("");
   const requestReviewFn = useServerFn(requestReview);
 
   useEffect(() => {
@@ -68,6 +93,46 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
   }, [task, assigneeId, currentUserId, open]);
 
   const set = <K extends keyof TaskInsert>(k: K, v: TaskInsert[K]) => setForm((f) => ({ ...f, [k]: v }));
+
+  const dod = useMemo(() => parseDod(form.dod), [form.dod]);
+  const setDod = (items: DodItem[]) => set("dod", items as unknown as TaskInsert["dod"]);
+
+  const historyQ = useQuery({
+    queryKey: ["dev_history", form.assignee_id],
+    enabled: open && !!form.assignee_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("id, title, status, trm, delegation_level, rework, manager_intervention, perceived_autonomy, completed_at, dod, recurrence")
+        .eq("assignee_id", form.assignee_id)
+        .order("completed_at", { ascending: false, nullsFirst: false })
+        .limit(60);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const history = historyQ.data ?? [];
+  const suggestions = useMemo(
+    () => devSuggestions(history.filter((t) => t.id !== task?.id), form.trm as Trm | null),
+    [history, form.trm, task?.id],
+  );
+
+  const previousDod = useMemo(() => {
+    if (!form.recurrence || form.recurrence === "one_off") return null;
+    const prev = history.find(
+      (t) => t.id !== task?.id && t.status === "done" && t.title === form.title && parseDod(t.dod).length > 0,
+    );
+    return prev ? parseDod(prev.dod).map((i) => ({ ...i, done: false })) : null;
+  }, [history, form.recurrence, form.title, task?.id]);
+
+  const pickTrm = (v: Trm | null) => {
+    setForm((f) => ({
+      ...f,
+      trm: v,
+      leadership_style: f.leadership_style_manual ? f.leadership_style : v ? TRM_TO_STYLE[v] : null,
+    }));
+  };
 
   const score = computeScore({
     impacts_margin: !!form.impacts_margin,
@@ -82,12 +147,17 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
     mutationFn: async () => {
       if (!form.title?.trim()) throw new Error("Título obrigatório");
       if (form.needs_review && !form.reviewer_id) throw new Error("Selecione um revisor");
+      if (form.status === "done") {
+        if (form.rework == null) throw new Error("Pós-task: informe se houve retrabalho");
+        if (form.manager_intervention == null) throw new Error("Pós-task: informe se houve intervenção do gestor");
+        if (form.perceived_autonomy == null) throw new Error("Pós-task: informe a autonomia percebida");
+      }
       if (task) {
-        const { id, score, is_overdue, position, s_reach, s_impact_norm, s_confidence_n, s_effort, s_urgency_mult, s_deadline_mult, created_at, updated_at, completed_at, ...updatable } = form as any;
+        const { id, score, is_overdue, position, s_reach, s_impact_norm, s_confidence_n, s_effort, s_urgency_mult, s_deadline_mult, dod_total, dod_done, created_at, updated_at, completed_at, ...updatable } = form as any;
         const { error } = await supabase.from("tasks").update(updatable).eq("id", task.id);
         if (error) throw error;
       } else {
-        const { id, score, is_overdue, position, s_reach, s_impact_norm, s_confidence_n, s_effort, s_urgency_mult, s_deadline_mult, created_at, updated_at, completed_at, ...insertable } = form as any;
+        const { id, score, is_overdue, position, s_reach, s_impact_norm, s_confidence_n, s_effort, s_urgency_mult, s_deadline_mult, dod_total, dod_done, created_at, updated_at, completed_at, ...insertable } = form as any;
         const { error } = await supabase.from("tasks").insert(insertable);
         if (error) throw error;
       }
@@ -96,6 +166,7 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
       toast.success(task ? "Tarefa atualizada" : "Tarefa criada");
       qc.invalidateQueries({ queryKey: ["tasks_with_score"] });
       qc.invalidateQueries({ queryKey: ["tasks_by_assignee"] });
+      qc.invalidateQueries({ queryKey: ["dev_history"] });
       onClose();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -230,6 +301,150 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
             <Input value={form.expected_output ?? ""} onChange={(e) => set("expected_output", e.target.value)} placeholder="Ex: relatório consolidado, dashboard atualizado…" />
           </Field>
         </Section>
+
+        <Section title="Desenvolvimento">
+          {suggestions.length > 0 && (
+            <div className="col-span-2 space-y-1 rounded-md border border-primary/30 bg-primary/5 p-3">
+              {suggestions.map((s) => (
+                <div key={s} className="flex gap-2 text-xs text-foreground">
+                  <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span>
+                    <b>Sugestão — você decide:</b> {s}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          <Field label="TRM (maturidade)">
+            <ToggleRow options={TRM_OPTIONS} value={(form.trm as Trm) ?? null} onChange={pickTrm} />
+            <p className="mt-1 text-[10px] text-muted-foreground">D1 iniciante · D2 aprendiz · D3 capaz · D4 autônomo</p>
+          </Field>
+          <Field label="Estilo de liderança">
+            <ToggleRow
+              options={STYLE_OPTIONS}
+              value={(form.leadership_style as Style) ?? null}
+              onChange={(v) => setForm((f) => ({ ...f, leadership_style: v, leadership_style_manual: v != null }))}
+            />
+            <p className="mt-1 text-[10px] text-muted-foreground">
+              {form.leadership_style_manual ? "Definido manualmente." : "Sugerido pelo TRM — clique para editar."}
+            </p>
+          </Field>
+          <Field label="Nível de delegação" full>
+            <ToggleRow
+              options={DELEGATION_LEVELS.map((n) => ({ value: n, label: String(n) }))}
+              value={form.delegation_level ?? null}
+              onChange={(v) => set("delegation_level", v)}
+            />
+            <p className="mt-1 text-[10px] text-muted-foreground">{delegationHint(form.delegation_level)}</p>
+          </Field>
+          <Field label={`Definition of Done ${dod.length ? `(${dod.filter((i) => i.done).length}/${dod.length})` : ""}`} full>
+            <div className="space-y-1.5">
+              {dod.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 rounded-md border bg-card px-2 py-1.5">
+                  <Checkbox
+                    checked={item.done}
+                    onCheckedChange={(c) => setDod(dod.map((i) => (i.id === item.id ? { ...i, done: c === true } : i)))}
+                  />
+                  <Input
+                    value={item.text}
+                    onChange={(e) => setDod(dod.map((i) => (i.id === item.id ? { ...i, text: e.target.value } : i)))}
+                    className="h-7 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+                  />
+                  <Button type="button" size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDod(dod.filter((i) => i.id !== item.id))}>
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Adicionar critério…"
+                  value={newCriterion}
+                  onChange={(e) => setNewCriterion(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newCriterion.trim()) {
+                      e.preventDefault();
+                      setDod([...dod, newDodItem(newCriterion.trim())]);
+                      setNewCriterion("");
+                    }
+                  }}
+                  className="h-8"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={!newCriterion.trim()}
+                  onClick={() => {
+                    setDod([...dod, newDodItem(newCriterion.trim())]);
+                    setNewCriterion("");
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    const existing = new Set(dod.map((i) => i.text.toLowerCase()));
+                    const add = suggestDod({
+                      impact_type: form.impact_type as string | null,
+                      recurrence: form.recurrence as string | null,
+                      needs_review: form.needs_review,
+                      expected_output: form.expected_output,
+                    })
+                      .filter((t) => !existing.has(t.toLowerCase()))
+                      .map(newDodItem);
+                    setDod([...dod, ...add]);
+                  }}
+                >
+                  <Lightbulb className="mr-1 h-3.5 w-3.5" /> Sugerir critérios
+                </Button>
+                {previousDod && (
+                  <Button type="button" size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setDod(previousDod)}>
+                    Usar DoD da ocorrência anterior
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Field>
+        </Section>
+
+        {form.status === "done" && (
+          <Section title="Pós-task (obrigatório)">
+            <Field label="Houve retrabalho?">
+              <ToggleRow
+                options={[
+                  { value: "yes", label: "Sim" },
+                  { value: "no", label: "Não" },
+                ]}
+                value={form.rework == null ? null : form.rework ? "yes" : "no"}
+                onChange={(v) => set("rework", v == null ? null : v === "yes")}
+              />
+            </Field>
+            <Field label="Intervenção do gestor?">
+              <ToggleRow
+                options={[
+                  { value: "yes", label: "Sim" },
+                  { value: "no", label: "Não" },
+                ]}
+                value={form.manager_intervention == null ? null : form.manager_intervention ? "yes" : "no"}
+                onChange={(v) => set("manager_intervention", v == null ? null : v === "yes")}
+              />
+            </Field>
+            <Field label="Autonomia percebida" full>
+              <ToggleRow
+                options={[1, 2, 3, 4, 5].map((n) => ({ value: n, label: String(n) }))}
+                value={form.perceived_autonomy ?? null}
+                onChange={(v) => set("perceived_autonomy", v)}
+              />
+              <p className="mt-1 text-[10px] text-muted-foreground">1 = precisou de muito apoio · 5 = totalmente autônomo</p>
+            </Field>
+          </Section>
+        )}
 
         <Section title="Governança">
           <Field label="Precisa de revisão">

@@ -214,6 +214,10 @@ function toCard(t: ScoredTask): TaskCardData {
     score: t.score,
     is_overdue: !!t.is_overdue,
     recurrence: t.recurrence ?? "one_off",
+    trm: t.trm ?? null,
+    delegation_level: t.delegation_level ?? null,
+    dod_total: t.dod_total ?? null,
+    dod_done: t.dod_done == null ? null : Number(t.dod_done),
   };
 }
 

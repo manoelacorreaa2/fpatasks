@@ -1,6 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlertCircle, Ban, MailCheck, MailWarning } from "lucide-react";
+import { ListChecks } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { fmtDate, fmtUSD, daysUntil } from "@/lib/format";
 
@@ -31,6 +32,10 @@ export interface TaskCardData {
   score: number | string | null;
   is_overdue: boolean;
   recurrence?: string | null;
+  trm?: string | null;
+  delegation_level?: number | null;
+  dod_total?: number | null;
+  dod_done?: number | null;
 }
 
 export function TaskCard({ task, onClick }: { task: TaskCardData; onClick?: () => void }) {
@@ -66,6 +71,21 @@ export function TaskCard({ task, onClick }: { task: TaskCardData; onClick?: () =
         {task.recurrence && task.recurrence !== "one_off" && (
           <span className="rounded border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:text-violet-300">
             {RECURRENCE_LABEL[task.recurrence] ?? task.recurrence}
+          </span>
+        )}
+        {task.trm && (
+          <span className="rounded border border-sky-500/30 bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase text-sky-700 dark:text-sky-300">
+            {task.trm}
+          </span>
+        )}
+        {task.delegation_level != null && (
+          <span className="rounded border border-teal-500/30 bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-medium text-teal-700 dark:text-teal-300">
+            del {task.delegation_level}
+          </span>
+        )}
+        {!!task.dod_total && (
+          <span className="inline-flex items-center gap-1 rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            <ListChecks className="h-3 w-3" /> {task.dod_done ?? 0}/{task.dod_total}
           </span>
         )}
         {task.is_blocked && (
