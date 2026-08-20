@@ -25,6 +25,66 @@ export const TRM_TO_STYLE: Record<Trm, Style> = { d1: "s1", d2: "s2", d3: "s3", 
 
 export const DELEGATION_LEVELS = [1, 2, 3, 4, 5, 6, 7] as const;
 
+/** Horas por semana que uma tarefa recorrente consome. */
+export function weeklyHours(recurrence: string | null | undefined, hours: number | null | undefined): number {
+  const h = Number(hours ?? 0);
+  if (!h) return 0;
+  switch (recurrence) {
+    case "daily":
+      return h * 5;
+    case "weekly":
+      return h;
+    case "monthly":
+      return h / 4.33;
+    default:
+      return 0;
+  }
+}
+
+export const WEEKLY_CAPACITY_HOURS = 40;
+
+export interface RoutineLoad {
+  weeklyHours: number;
+  capacityPct: number;
+  freeHours: number;
+}
+
+export function routineLoad(
+  tasks: { recurrence?: string | null; estimated_hours?: number | string | null; status?: string | null }[],
+  people = 1,
+): RoutineLoad {
+  const total = tasks
+    .filter((t) => t.recurrence && t.recurrence !== "one_off")
+    .reduce((s, t) => s + weeklyHours(t.recurrence, t.estimated_hours == null ? null : Number(t.estimated_hours)), 0);
+  const capacity = WEEKLY_CAPACITY_HOURS * Math.max(1, people);
+  return {
+    weeklyHours: total,
+    capacityPct: (total / capacity) * 100,
+    freeHours: Math.max(0, capacity - total),
+  };
+}
+
+/** Média mensal do nível de delegação nas tarefas concluídas (ordem crescente de mês). */
+export function delegationTrend(
+  tasks: { completed_at?: string | null; delegation_level?: number | null; status?: string | null }[],
+): { month: string; avg: number; count: number }[] {
+  const buckets = new Map<string, number[]>();
+  for (const t of tasks) {
+    if (t.status !== "done" || t.delegation_level == null || !t.completed_at) continue;
+    const d = new Date(t.completed_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key)!.push(t.delegation_level);
+  }
+  return [...buckets.entries()]
+    .sort((a, b) => (a[0] < b[0] ? -1 : 1))
+    .map(([key, vals]) => {
+      const [y, m] = key.split("-");
+      const label = new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+      return { month: label, avg: vals.reduce((s, n) => s + n, 0) / vals.length, count: vals.length };
+    });
+}
+
 export function delegationHint(level: number | null | undefined): string {
   if (level == null) return "1–2 gestor decide · 3–4 compartilhado · 5–7 liderado decide";
   if (level <= 2) return "Nível " + level + " — gestor decide";

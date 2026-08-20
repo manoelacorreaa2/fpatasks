@@ -158,6 +158,80 @@ export type Database = {
         }
         Relationships: []
       }
+      task_templates: {
+        Row: {
+          confidence: number
+          created_at: string
+          delegation_level: number | null
+          description: string | null
+          dod: Json
+          estimated_hours: number | null
+          estimated_impact_usd: number
+          expected_output: string | null
+          id: string
+          impact_type: Database["public"]["Enums"]["impact_type"] | null
+          impacts_margin: boolean
+          name: string
+          needs_review: boolean
+          owner_id: string
+          recurrence: Database["public"]["Enums"]["task_recurrence"]
+          title: string
+          trm: Database["public"]["Enums"]["task_trm"] | null
+          updated_at: string
+          urgency: Database["public"]["Enums"]["task_urgency"]
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          delegation_level?: number | null
+          description?: string | null
+          dod?: Json
+          estimated_hours?: number | null
+          estimated_impact_usd?: number
+          expected_output?: string | null
+          id?: string
+          impact_type?: Database["public"]["Enums"]["impact_type"] | null
+          impacts_margin?: boolean
+          name: string
+          needs_review?: boolean
+          owner_id: string
+          recurrence?: Database["public"]["Enums"]["task_recurrence"]
+          title?: string
+          trm?: Database["public"]["Enums"]["task_trm"] | null
+          updated_at?: string
+          urgency?: Database["public"]["Enums"]["task_urgency"]
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          delegation_level?: number | null
+          description?: string | null
+          dod?: Json
+          estimated_hours?: number | null
+          estimated_impact_usd?: number
+          expected_output?: string | null
+          id?: string
+          impact_type?: Database["public"]["Enums"]["impact_type"] | null
+          impacts_margin?: boolean
+          name?: string
+          needs_review?: boolean
+          owner_id?: string
+          recurrence?: Database["public"]["Enums"]["task_recurrence"]
+          title?: string
+          trm?: Database["public"]["Enums"]["task_trm"] | null
+          updated_at?: string
+          urgency?: Database["public"]["Enums"]["task_urgency"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_templates_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           actual_impact_usd: number | null

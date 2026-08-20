@@ -45,6 +45,8 @@ interface Props {
   currentUserId: string;
   profiles: Profile[];
   isAdmin?: boolean;
+  /** Valores iniciais (ex.: criação a partir de um modelo). */
+  initial?: Partial<TaskInsert> | null;
 }
 
 const empty = (assigneeId: string, currentUserId: string): TaskInsert => ({
@@ -78,19 +80,26 @@ const empty = (assigneeId: string, currentUserId: string): TaskInsert => ({
   perceived_autonomy: null,
 });
 
-export function TaskModal({ open, onClose, task, assigneeId, currentUserId, profiles, isAdmin = false }: Props) {
+export function TaskModal({ open, onClose, task, assigneeId, currentUserId, profiles, isAdmin = false, initial = null }: Props) {
   const qc = useQueryClient();
   const [form, setForm] = useState<TaskInsert>(() => empty(assigneeId, currentUserId));
   const [newCriterion, setNewCriterion] = useState("");
+  const [showDev, setShowDev] = useState(false);
+  const [templateName, setTemplateName] = useState("");
   const requestReviewFn = useServerFn(requestReview);
 
   useEffect(() => {
     if (task) {
       setForm({ ...task });
     } else {
-      setForm(empty(assigneeId, currentUserId));
+      setForm({ ...empty(assigneeId, currentUserId), ...(initial ?? {}) });
     }
-  }, [task, assigneeId, currentUserId, open]);
+    setShowDev(false);
+  }, [task, assigneeId, currentUserId, open, initial]);
+
+  /** Tarefa do próprio gestor: não faz sentido pedir maturidade/delegação/pós-task. */
+  const isManagerOwnTask = isAdmin && form.assignee_id === currentUserId;
+  const devVisible = !isManagerOwnTask || showDev;
 
   const set = <K extends keyof TaskInsert>(k: K, v: TaskInsert[K]) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -147,7 +156,7 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
     mutationFn: async () => {
       if (!form.title?.trim()) throw new Error("Título obrigatório");
       if (form.needs_review && !form.reviewer_id) throw new Error("Selecione um revisor");
-      if (form.status === "done") {
+      if (form.status === "done" && devVisible) {
         if (form.rework == null) throw new Error("Pós-task: informe se houve retrabalho");
         if (form.manager_intervention == null) throw new Error("Pós-task: informe se houve intervenção do gestor");
         if (form.perceived_autonomy == null) throw new Error("Pós-task: informe a autonomia percebida");
