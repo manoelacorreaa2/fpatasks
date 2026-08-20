@@ -1,9 +1,11 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlertCircle, Ban, MailCheck, MailWarning } from "lucide-react";
+import { AlertCircle, Ban, CheckCircle2, MailCheck, MailWarning } from "lucide-react";
 import { ListChecks } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { fmtDate, fmtUSD, daysUntil } from "@/lib/format";
+import { DELEGATION_LEVELS } from "@/lib/development";
 
 const URGENCY_STYLE: Record<string, string> = {
   low: "bg-muted text-muted-foreground",
@@ -38,7 +40,17 @@ export interface TaskCardData {
   dod_done?: number | null;
 }
 
-export function TaskCard({ task, onClick }: { task: TaskCardData; onClick?: () => void }) {
+interface TaskCardProps {
+  task: TaskCardData;
+  onClick?: () => void;
+  /** Card da coluna Rotina: mostra botão Concluir e ajuste rápido de delegação. */
+  routine?: boolean;
+  onComplete?: () => void;
+  onDelegationChange?: (level: number) => void;
+  busy?: boolean;
+}
+
+export function TaskCard({ task, onClick, routine, onComplete, onDelegationChange, busy }: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -108,6 +120,40 @@ export function TaskCard({ task, onClick }: { task: TaskCardData; onClick?: () =
         </span>
         <span className="tabular-nums">{fmtUSD(Number(task.estimated_impact_usd ?? 0))}</span>
       </div>
+      {routine && (
+        <div
+          className="mt-3 space-y-2 border-t pt-2"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {onDelegationChange && (
+            <div>
+              <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Delegação</div>
+              <div className="flex gap-1">
+                {DELEGATION_LEVELS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => onDelegationChange(n)}
+                    className={`h-6 flex-1 rounded border text-[10px] font-medium transition-colors ${
+                      task.delegation_level === n
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:border-primary/40"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {onComplete && (
+            <Button size="sm" variant="secondary" className="h-7 w-full text-xs" disabled={busy} onClick={onComplete}>
+              <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Concluir ocorrência
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
