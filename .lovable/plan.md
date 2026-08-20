@@ -28,16 +28,13 @@ A coluna Feito ganha um seletor de mês no cabeçalho, começando no mês atual 
 
 ## 4. Outras melhorias sugeridas (escolha o que entra)
 
-Ordenadas por relação valor/esforço:
+Aprovadas para esta rodada:
 
-1. **Recorrentes que atrasaram** — badge vermelho em Rotina quando a ocorrência da semana/mês passou do prazo sem ser concluída, e contador "atrasadas" no topo.
-2. **Rotina como % da capacidade** — soma das horas estimadas das recorrentes por semana vs. horas úteis, para ver quanto do time está preso em rotina e quanto sobra para projeto/impacto.
-3. **Templates de tarefa** — salvar uma tarefa como modelo (DoD, horas, impacto, recorrência) e criar novas em um clique; ideal para reports.
-4. **Tendência de delegação por pessoa** — gráfico simples no Desenvolvimento mostrando o nível médio de delegação subindo mês a mês (evidência de autonomia crescente).
-5. **Resumo semanal por email** — segunda-feira, um email com o que foi entregue, o impacto do mês e o que está atrasado (usa o Gmail já conectado).
-6. **Meta de impacto mensal** — definir alvo em USD por pessoa/time e mostrar o quanto já foi entregue no mês.
+- **Rotina como % da capacidade** — soma das horas estimadas das recorrentes por semana vs. horas úteis, para ver quanto do time está preso em rotina e quanto sobra para projeto/impacto.
+- **Templates de tarefa** — salvar uma tarefa como modelo (DoD, horas, impacto, recorrência) e criar novas em um clique; ideal para reports.
+- **Tendência de delegação por pessoa** — gráfico no Desenvolvimento mostrando o nível médio de delegação subindo mês a mês (evidência de autonomia crescente).
 
-Me diga quais desses (1–6) você quer nesta rodada; posso fazer os três primeiros pontos do plano agora e os extras em seguida.
+Fora do escopo: badge de recorrente atrasada, resumo semanal por email, meta de impacto mensal.
 
 ## Detalhes técnicos
 
@@ -46,3 +43,6 @@ Me diga quais desses (1–6) você quer nesta rodada; posso fazer os três prime
 - `src/components/task-card.tsx`: variante `routine` com periodicidade, próximo prazo, botão Concluir e stepper de delegação inline.
 - `src/components/task-modal.tsx`: props para esconder TRM/estilo/delegação e não exigir pós-task quando `assignee_id` é admin/você; toggle "mostrar campos de delegação".
 - Lista de admins vem de `user_roles` (nova query leve com `has_role`/select por role) para decidir se a tarefa é "de gestor".
+- Capacidade: cálculo no frontend (horas das recorrentes normalizadas por semana / 40h por pessoa), exibido no topo do board.
+- Templates: nova tabela `task_templates` (dono, título, campos padrão, `dod` jsonb) com RLS + GRANTs; "Salvar como modelo" no modal e "Criar de um modelo" no board.
+- Tendência de delegação: agregação mensal de `delegation_level` das concluídas, gráfico recharts em `desenvolvimento.tsx`.
