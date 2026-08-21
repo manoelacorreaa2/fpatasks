@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { fmtDate, fmtPct } from "@/lib/format";
-import { TRM_OPTIONS, devStats, devSuggestions, delegationHint, type Trm } from "@/lib/development";
-import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { TRM_OPTIONS, devStats, devSuggestions, delegationHint, delegationTrend, type Trm } from "@/lib/development";
+import { BarChart, Bar, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/desenvolvimento")({
   head: () => ({
@@ -72,6 +72,7 @@ function DevelopmentPage() {
 
   const stats = devStats(tasks);
   const suggestions = devSuggestions(tasks);
+  const trend = delegationTrend(tasks);
   const trmData = TRM_OPTIONS.map((o) => ({ name: `${o.label} · ${o.hint}`, total: stats.trmDist[o.value] }));
 
   const recentDone = tasks
