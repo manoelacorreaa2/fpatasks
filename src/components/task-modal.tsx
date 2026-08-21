@@ -324,28 +324,40 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
               ))}
             </div>
           )}
-          <Field label="TRM (maturidade)">
-            <ToggleRow options={TRM_OPTIONS} value={(form.trm as Trm) ?? null} onChange={pickTrm} />
-            <p className="mt-1 text-[10px] text-muted-foreground">D1 iniciante · D2 aprendiz · D3 capaz · D4 autônomo</p>
-          </Field>
-          <Field label="Estilo de liderança">
-            <ToggleRow
-              options={STYLE_OPTIONS}
-              value={(form.leadership_style as Style) ?? null}
-              onChange={(v) => setForm((f) => ({ ...f, leadership_style: v, leadership_style_manual: v != null }))}
-            />
-            <p className="mt-1 text-[10px] text-muted-foreground">
-              {form.leadership_style_manual ? "Definido manualmente." : "Sugerido pelo TRM — clique para editar."}
-            </p>
-          </Field>
-          <Field label="Nível de delegação" full>
-            <ToggleRow
-              options={DELEGATION_LEVELS.map((n) => ({ value: n, label: String(n) }))}
-              value={form.delegation_level ?? null}
-              onChange={(v) => set("delegation_level", v)}
-            />
-            <p className="mt-1 text-[10px] text-muted-foreground">{delegationHint(form.delegation_level)}</p>
-          </Field>
+          {isManagerOwnTask && (
+            <div className="col-span-2 flex items-center justify-between rounded-md border border-dashed bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+              <span>Tarefa sua — maturidade e delegação não se aplicam.</span>
+              <Button type="button" variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setShowDev((v) => !v)}>
+                {showDev ? "esconder campos de delegação" : "mostrar campos de delegação"}
+              </Button>
+            </div>
+          )}
+          {devVisible && (
+            <>
+              <Field label="TRM (maturidade)">
+                <ToggleRow options={TRM_OPTIONS} value={(form.trm as Trm) ?? null} onChange={pickTrm} />
+                <p className="mt-1 text-[10px] text-muted-foreground">D1 iniciante · D2 aprendiz · D3 capaz · D4 autônomo</p>
+              </Field>
+              <Field label="Estilo de liderança">
+                <ToggleRow
+                  options={STYLE_OPTIONS}
+                  value={(form.leadership_style as Style) ?? null}
+                  onChange={(v) => setForm((f) => ({ ...f, leadership_style: v, leadership_style_manual: v != null }))}
+                />
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {form.leadership_style_manual ? "Definido manualmente." : "Sugerido pelo TRM — clique para editar."}
+                </p>
+              </Field>
+              <Field label="Nível de delegação" full>
+                <ToggleRow
+                  options={DELEGATION_LEVELS.map((n) => ({ value: n, label: String(n) }))}
+                  value={form.delegation_level ?? null}
+                  onChange={(v) => set("delegation_level", v)}
+                />
+                <p className="mt-1 text-[10px] text-muted-foreground">{delegationHint(form.delegation_level)}</p>
+              </Field>
+            </>
+          )}
           <Field label={`Definition of Done ${dod.length ? `(${dod.filter((i) => i.done).length}/${dod.length})` : ""}`} full>
             <div className="space-y-1.5">
               {dod.map((item) => (
