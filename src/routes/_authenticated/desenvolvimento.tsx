@@ -169,6 +169,30 @@ function DevelopmentPage() {
       </section>
 
       <Card>
+        <CardHeader>
+          <CardTitle>Tendência do nível de delegação</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {trend.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Sem entregas com nível de delegação registrado ainda.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <LineChart data={trend}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="month" className="text-xs" />
+                <YAxis domain={[1, 7]} allowDecimals={false} className="text-xs" />
+                <Tooltip />
+                <Line type="monotone" dataKey="avg" stroke="hsl(var(--primary))" strokeWidth={2} name="Delegação média" />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+          <p className="mt-2 text-xs text-muted-foreground">
+            A linha subindo é evidência de autonomia crescente — meta é migrar de 1–2 para 5–7.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader><CardTitle>Entregas recentes</CardTitle></CardHeader>
         <CardContent className="space-y-2">
           {recentDone.length === 0 ? (
