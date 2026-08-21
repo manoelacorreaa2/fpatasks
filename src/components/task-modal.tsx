@@ -217,6 +217,38 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const saveTemplate = useMutation({
+    mutationFn: async () => {
+      const name = templateName.trim() || form.title?.trim();
+      if (!name) throw new Error("Dê um nome ao modelo");
+      const { error } = await supabase.from("task_templates").insert({
+        owner_id: currentUserId,
+        name,
+        title: form.title ?? "",
+        description: form.description ?? null,
+        urgency: (form.urgency as any) ?? "medium",
+        recurrence: (form.recurrence as any) ?? "one_off",
+        impacts_margin: !!form.impacts_margin,
+        impact_type: (form.impact_type as any) ?? null,
+        estimated_impact_usd: Number(form.estimated_impact_usd ?? 0),
+        estimated_hours: form.estimated_hours == null ? null : Number(form.estimated_hours),
+        confidence: Number(form.confidence ?? 3),
+        expected_output: form.expected_output ?? null,
+        needs_review: !!form.needs_review,
+        trm: (form.trm as any) ?? null,
+        delegation_level: form.delegation_level ?? null,
+        dod: (form.dod ?? []) as any,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Modelo salvo");
+      setTemplateName("");
+      qc.invalidateQueries({ queryKey: ["task_templates"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -312,7 +344,7 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
         </Section>
 
         <Section title="Desenvolvimento">
-          {suggestions.length > 0 && (
+          {suggestions.length > 0 && devVisible && (
             <div className="col-span-2 space-y-1 rounded-md border border-primary/30 bg-primary/5 p-3">
               {suggestions.map((s) => (
                 <div key={s} className="flex gap-2 text-xs text-foreground">
@@ -324,28 +356,40 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
               ))}
             </div>
           )}
-          <Field label="TRM (maturidade)">
-            <ToggleRow options={TRM_OPTIONS} value={(form.trm as Trm) ?? null} onChange={pickTrm} />
-            <p className="mt-1 text-[10px] text-muted-foreground">D1 iniciante · D2 aprendiz · D3 capaz · D4 autônomo</p>
-          </Field>
-          <Field label="Estilo de liderança">
-            <ToggleRow
-              options={STYLE_OPTIONS}
-              value={(form.leadership_style as Style) ?? null}
-              onChange={(v) => setForm((f) => ({ ...f, leadership_style: v, leadership_style_manual: v != null }))}
-            />
-            <p className="mt-1 text-[10px] text-muted-foreground">
-              {form.leadership_style_manual ? "Definido manualmente." : "Sugerido pelo TRM — clique para editar."}
-            </p>
-          </Field>
-          <Field label="Nível de delegação" full>
-            <ToggleRow
-              options={DELEGATION_LEVELS.map((n) => ({ value: n, label: String(n) }))}
-              value={form.delegation_level ?? null}
-              onChange={(v) => set("delegation_level", v)}
-            />
-            <p className="mt-1 text-[10px] text-muted-foreground">{delegationHint(form.delegation_level)}</p>
-          </Field>
+          {isManagerOwnTask && (
+            <div className="col-span-2 flex items-center justify-between rounded-md border border-dashed bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+              <span>Tarefa sua — maturidade e delegação não se aplicam.</span>
+              <Button type="button" variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setShowDev((v) => !v)}>
+                {showDev ? "esconder campos de delegação" : "mostrar campos de delegação"}
+              </Button>
+            </div>
+          )}
+          {devVisible && (
+            <>
+              <Field label="TRM (maturidade)">
+                <ToggleRow options={TRM_OPTIONS} value={(form.trm as Trm) ?? null} onChange={pickTrm} />
+                <p className="mt-1 text-[10px] text-muted-foreground">D1 iniciante · D2 aprendiz · D3 capaz · D4 autônomo</p>
+              </Field>
+              <Field label="Estilo de liderança">
+                <ToggleRow
+                  options={STYLE_OPTIONS}
+                  value={(form.leadership_style as Style) ?? null}
+                  onChange={(v) => setForm((f) => ({ ...f, leadership_style: v, leadership_style_manual: v != null }))}
+                />
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {form.leadership_style_manual ? "Definido manualmente." : "Sugerido pelo TRM — clique para editar."}
+                </p>
+              </Field>
+              <Field label="Nível de delegação" full>
+                <ToggleRow
+                  options={DELEGATION_LEVELS.map((n) => ({ value: n, label: String(n) }))}
+                  value={form.delegation_level ?? null}
+                  onChange={(v) => set("delegation_level", v)}
+                />
+                <p className="mt-1 text-[10px] text-muted-foreground">{delegationHint(form.delegation_level)}</p>
+              </Field>
+            </>
+          )}
           <Field label={`Definition of Done ${dod.length ? `(${dod.filter((i) => i.done).length}/${dod.length})` : ""}`} full>
             <div className="space-y-1.5">
               {dod.map((item) => (
@@ -422,7 +466,7 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
           </Field>
         </Section>
 
-        {form.status === "done" && (
+        {form.status === "done" && devVisible && (
           <Section title="Pós-task (obrigatório)">
             <Field label="Houve retrabalho?">
               <ToggleRow
@@ -490,6 +534,24 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
               <Textarea rows={2} value={form.blocked_reason ?? ""} onChange={(e) => set("blocked_reason", e.target.value)} />
             </Field>
           )}
+        </Section>
+
+        <Section title="Modelo">
+          <div className="col-span-2 flex flex-wrap items-end gap-2">
+            <div className="flex-1 min-w-48">
+              <Label className="text-xs">Salvar esta tarefa como modelo</Label>
+              <Input
+                className="mt-1"
+                placeholder={form.title || "Nome do modelo"}
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+              />
+            </div>
+            <Button type="button" variant="outline" disabled={saveTemplate.isPending} onClick={() => saveTemplate.mutate()}>
+              {saveTemplate.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar como modelo
+            </Button>
+          </div>
         </Section>
 
         <DialogFooter className="flex items-center justify-between sm:justify-between">
