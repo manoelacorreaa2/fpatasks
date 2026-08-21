@@ -434,7 +434,7 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
           </Field>
         </Section>
 
-        {form.status === "done" && (
+        {form.status === "done" && devVisible && (
           <Section title="Pós-task (obrigatório)">
             <Field label="Houve retrabalho?">
               <ToggleRow
