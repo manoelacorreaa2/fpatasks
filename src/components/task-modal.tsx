@@ -312,7 +312,7 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
         </Section>
 
         <Section title="Desenvolvimento">
-          {suggestions.length > 0 && (
+          {suggestions.length > 0 && devVisible && (
             <div className="col-span-2 space-y-1 rounded-md border border-primary/30 bg-primary/5 p-3">
               {suggestions.map((s) => (
                 <div key={s} className="flex gap-2 text-xs text-foreground">
