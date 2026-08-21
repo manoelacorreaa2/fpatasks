@@ -217,6 +217,38 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const saveTemplate = useMutation({
+    mutationFn: async () => {
+      const name = templateName.trim() || form.title?.trim();
+      if (!name) throw new Error("Dê um nome ao modelo");
+      const { error } = await supabase.from("task_templates").insert({
+        owner_id: currentUserId,
+        name,
+        title: form.title ?? "",
+        description: form.description ?? null,
+        urgency: (form.urgency as any) ?? "medium",
+        recurrence: (form.recurrence as any) ?? "one_off",
+        impacts_margin: !!form.impacts_margin,
+        impact_type: (form.impact_type as any) ?? null,
+        estimated_impact_usd: Number(form.estimated_impact_usd ?? 0),
+        estimated_hours: form.estimated_hours == null ? null : Number(form.estimated_hours),
+        confidence: Number(form.confidence ?? 3),
+        expected_output: form.expected_output ?? null,
+        needs_review: !!form.needs_review,
+        trm: (form.trm as any) ?? null,
+        delegation_level: form.delegation_level ?? null,
+        dod: (form.dod ?? []) as any,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Modelo salvo");
+      setTemplateName("");
+      qc.invalidateQueries({ queryKey: ["task_templates"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
