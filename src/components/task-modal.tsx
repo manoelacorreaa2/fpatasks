@@ -536,6 +536,24 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
           )}
         </Section>
 
+        <Section title="Modelo">
+          <div className="col-span-2 flex flex-wrap items-end gap-2">
+            <div className="flex-1 min-w-48">
+              <Label className="text-xs">Salvar esta tarefa como modelo</Label>
+              <Input
+                className="mt-1"
+                placeholder={form.title || "Nome do modelo"}
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+              />
+            </div>
+            <Button type="button" variant="outline" disabled={saveTemplate.isPending} onClick={() => saveTemplate.mutate()}>
+              {saveTemplate.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar como modelo
+            </Button>
+          </div>
+        </Section>
+
         <DialogFooter className="flex items-center justify-between sm:justify-between">
           <div>
             {task && (
