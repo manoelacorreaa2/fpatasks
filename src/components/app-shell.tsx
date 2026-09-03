@@ -69,6 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           {user && navItem(`/tasks/${user.id}`, "Minhas tarefas", ListChecks, pathname.startsWith("/tasks/") && pathname.includes(user.id))}
           {navItem("/historico", "Histórico", History, pathname === "/historico")}
           {navItem("/desenvolvimento", "Desenvolvimento", TrendingUp, pathname === "/desenvolvimento")}
+          {navItem("/metodologia", "Metodologia", BookOpen, pathname === "/metodologia")}
           <div className="mt-3 px-3 text-xs uppercase tracking-wide text-muted-foreground">Equipe</div>
           {profiles.map((p) =>
             navItem(
