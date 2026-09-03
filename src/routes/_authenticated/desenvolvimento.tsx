@@ -90,7 +90,10 @@ function DevelopmentPage() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Desenvolvimento</h1>
-          <p className="text-sm text-muted-foreground">Maturidade, delegação e autonomia — o sistema apenas sugere, você decide.</p>
+          <p className="text-sm text-muted-foreground">
+            Maturidade, delegação e autonomia — o sistema apenas sugere, você decide.{" "}
+            <Link to="/metodologia" className="underline hover:text-foreground">entender o modelo</Link>
+          </p>
         </div>
         <div className="flex gap-2">
           <Select value={person} onValueChange={setPerson}>
