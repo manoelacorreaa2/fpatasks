@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, LogOut, Shield, ListChecks, History, TrendingUp } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, Shield, ListChecks, History, TrendingUp, BookOpen } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";

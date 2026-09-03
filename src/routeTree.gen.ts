@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticated/overview'
+import { Route as AuthenticatedMetodologiaRouteImport } from './routes/_authenticated/metodologia'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedDesenvolvimentoRouteImport } from './routes/_authenticated/desenvolvimento'
 import { Route as AuthenticatedTasksUserIdRouteImport } from './routes/_authenticated/tasks.$userId'
@@ -38,6 +39,12 @@ const AuthenticatedOverviewRoute = AuthenticatedOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMetodologiaRoute =
+  AuthenticatedMetodologiaRouteImport.update({
+    id: '/metodologia',
+    path: '/metodologia',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
   id: '/historico',
   path: '/historico',
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/historico': typeof AuthenticatedHistoricoRoute
+  '/metodologia': typeof AuthenticatedMetodologiaRoute
   '/overview': typeof AuthenticatedOverviewRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/historico': typeof AuthenticatedHistoricoRoute
+  '/metodologia': typeof AuthenticatedMetodologiaRoute
   '/overview': typeof AuthenticatedOverviewRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -94,6 +103,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
+  '/_authenticated/metodologia': typeof AuthenticatedMetodologiaRoute
   '/_authenticated/overview': typeof AuthenticatedOverviewRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/desenvolvimento'
     | '/historico'
+    | '/metodologia'
     | '/overview'
     | '/admin/members'
     | '/tasks/$userId'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/desenvolvimento'
     | '/historico'
+    | '/metodologia'
     | '/overview'
     | '/admin/members'
     | '/tasks/$userId'
@@ -127,6 +139,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/desenvolvimento'
     | '/_authenticated/historico'
+    | '/_authenticated/metodologia'
     | '/_authenticated/overview'
     | '/_authenticated/admin/members'
     | '/_authenticated/tasks/$userId'
@@ -170,6 +183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOverviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/metodologia': {
+      id: '/_authenticated/metodologia'
+      path: '/metodologia'
+      fullPath: '/metodologia'
+      preLoaderRoute: typeof AuthenticatedMetodologiaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/historico': {
       id: '/_authenticated/historico'
       path: '/historico'
@@ -211,6 +231,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDesenvolvimentoRoute: typeof AuthenticatedDesenvolvimentoRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
+  AuthenticatedMetodologiaRoute: typeof AuthenticatedMetodologiaRoute
   AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
   AuthenticatedTasksUserIdRoute: typeof AuthenticatedTasksUserIdRoute
@@ -219,6 +240,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDesenvolvimentoRoute: AuthenticatedDesenvolvimentoRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
+  AuthenticatedMetodologiaRoute: AuthenticatedMetodologiaRoute,
   AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
   AuthenticatedTasksUserIdRoute: AuthenticatedTasksUserIdRoute,
