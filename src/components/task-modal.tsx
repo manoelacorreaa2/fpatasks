@@ -388,6 +388,13 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
                 />
                 <p className="mt-1 text-[10px] text-muted-foreground">{delegationHint(form.delegation_level)}</p>
               </Field>
+              <p className="col-span-2 text-[10px] leading-relaxed text-muted-foreground">
+                O nível é da combinação pessoa+task, não da pessoa — mais instrução significa task nova, não desconfiança.{" "}
+                <a href="/metodologia" target="_blank" rel="noreferrer" className="underline hover:text-foreground">
+                  ver metodologia
+                </a>
+              </p>
+
             </>
           )}
           <Field label={`Definition of Done ${dod.length ? `(${dod.filter((i) => i.done).length}/${dod.length})` : ""}`} full>
