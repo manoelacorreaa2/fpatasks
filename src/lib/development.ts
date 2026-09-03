@@ -23,7 +23,62 @@ export const STYLE_OPTIONS: { value: Style; label: string; hint: string }[] = [
 
 export const TRM_TO_STYLE: Record<Trm, Style> = { d1: "s1", d2: "s2", d3: "s3", d4: "s4" };
 
+export interface TrmMatrixRow {
+  trm: Trm;
+  level: string;
+  competence: string;
+  commitment: string;
+  style: Style;
+  styleLabel: string;
+  action: string;
+}
+
+/** Matriz do modelo de liderança situacional usada na aba Metodologia. */
+export const TRM_MATRIX: TrmMatrixRow[] = [
+  {
+    trm: "d1",
+    level: "D1 iniciante",
+    competence: "baixa",
+    commitment: "alto",
+    style: "s1",
+    styleLabel: "S1 dirigir",
+    action: "muita instrução, pouca conversa de motivação",
+  },
+  {
+    trm: "d2",
+    level: "D2 aprendiz",
+    competence: "alguma",
+    commitment: "baixo",
+    style: "s2",
+    styleLabel: "S2 treinar",
+    action: "muita instrução E muito apoio",
+  },
+  {
+    trm: "d3",
+    level: "D3 capaz",
+    competence: "alta",
+    commitment: "variável",
+    style: "s3",
+    styleLabel: "S3 apoiar",
+    action: "pouca instrução, muito apoio",
+  },
+  {
+    trm: "d4",
+    level: "D4 autônomo",
+    competence: "alta",
+    commitment: "alto",
+    style: "s4",
+    styleLabel: "S4 delegar",
+    action: "recebe o resultado",
+  },
+];
+
+/** Nota fixa: o nível é da combinação pessoa+task, não da pessoa. */
+export const LEVEL_IS_PER_TASK_NOTE =
+  "O nível é da combinação pessoa+task, não da pessoa. Se eu explico mais para alguém, é porque aquela task é nova para essa pessoa — não é desconfiança nem preferência. Quando o nível sobe, eu explico menos, e isso é o objetivo.";
+
 export const DELEGATION_LEVELS = [1, 2, 3, 4, 5, 6, 7] as const;
+
 
 /** Horas por semana que uma tarefa recorrente consome. */
 export function weeklyHours(recurrence: string | null | undefined, hours: number | null | undefined): number {
