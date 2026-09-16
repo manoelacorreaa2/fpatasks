@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      competencies: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_logs: {
         Row: {
           created_at: string
@@ -68,6 +98,171 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      feedback_scores: {
+        Row: {
+          competency_id: string
+          created_at: string
+          feedback_id: string
+          id: string
+          score: number
+        }
+        Insert: {
+          competency_id: string
+          created_at?: string
+          feedback_id: string
+          id?: string
+          score: number
+        }
+        Update: {
+          competency_id?: string
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_scores_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_scores_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "feedbacks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedbacks: {
+        Row: {
+          author_id: string
+          comment: string | null
+          created_at: string
+          development_points: string | null
+          evidence: string | null
+          feedback_date: string
+          id: string
+          next_action: string | null
+          strengths: string | null
+          subject_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          comment?: string | null
+          created_at?: string
+          development_points?: string | null
+          evidence?: string | null
+          feedback_date?: string
+          id?: string
+          next_action?: string | null
+          strengths?: string | null
+          subject_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          comment?: string | null
+          created_at?: string
+          development_points?: string | null
+          evidence?: string | null
+          feedback_date?: string
+          id?: string
+          next_action?: string | null
+          strengths?: string | null
+          subject_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedbacks_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_level_expectations: {
+        Row: {
+          competency_id: string
+          created_at: string
+          expected_score: number
+          id: string
+          job_level_id: string
+          updated_at: string
+        }
+        Insert: {
+          competency_id: string
+          created_at?: string
+          expected_score: number
+          id?: string
+          job_level_id: string
+          updated_at?: string
+        }
+        Update: {
+          competency_id?: string
+          created_at?: string
+          expected_score?: number
+          id?: string
+          job_level_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_level_expectations_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_level_expectations_job_level_id_fkey"
+            columns: ["job_level_id"]
+            isOneToOne: false
+            referencedRelation: "job_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_levels: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          level: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       kpi_snapshots: {
         Row: {
@@ -139,6 +334,7 @@ export type Database = {
           full_name: string
           id: string
           is_active: boolean
+          job_level_id: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -147,6 +343,7 @@ export type Database = {
           full_name?: string
           id: string
           is_active?: boolean
+          job_level_id?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -155,6 +352,39 @@ export type Database = {
           full_name?: string
           id?: string
           is_active?: boolean
+          job_level_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_job_level_id_fkey"
+            columns: ["job_level_id"]
+            isOneToOne: false
+            referencedRelation: "job_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rating_scales: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          updated_at?: string
+          value?: number
         }
         Relationships: []
       }
@@ -243,6 +473,9 @@ export type Database = {
           created_by: string | null
           deadline: string | null
           delegation_level: number | null
+          delivery_rating: number | null
+          delivery_rating_competency_id: string | null
+          delivery_rating_note: string | null
           description: string | null
           dod: Json
           estimated_hours: number | null
@@ -280,6 +513,9 @@ export type Database = {
           created_by?: string | null
           deadline?: string | null
           delegation_level?: number | null
+          delivery_rating?: number | null
+          delivery_rating_competency_id?: string | null
+          delivery_rating_note?: string | null
           description?: string | null
           dod?: Json
           estimated_hours?: number | null
@@ -317,6 +553,9 @@ export type Database = {
           created_by?: string | null
           deadline?: string | null
           delegation_level?: number | null
+          delivery_rating?: number | null
+          delivery_rating_competency_id?: string | null
+          delivery_rating_note?: string | null
           description?: string | null
           dod?: Json
           estimated_hours?: number | null
@@ -357,6 +596,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_delivery_rating_competency_id_fkey"
+            columns: ["delivery_rating_competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
             referencedColumns: ["id"]
           },
           {
@@ -402,6 +648,9 @@ export type Database = {
           created_by: string | null
           deadline: string | null
           delegation_level: number | null
+          delivery_rating: number | null
+          delivery_rating_competency_id: string | null
+          delivery_rating_note: string | null
           description: string | null
           dod: Json | null
           dod_done: number | null
@@ -449,6 +698,9 @@ export type Database = {
           created_by?: string | null
           deadline?: string | null
           delegation_level?: number | null
+          delivery_rating?: number | null
+          delivery_rating_competency_id?: string | null
+          delivery_rating_note?: string | null
           description?: string | null
           dod?: Json | null
           dod_done?: never
@@ -496,6 +748,9 @@ export type Database = {
           created_by?: string | null
           deadline?: string | null
           delegation_level?: number | null
+          delivery_rating?: number | null
+          delivery_rating_competency_id?: string | null
+          delivery_rating_note?: string | null
           description?: string | null
           dod?: Json | null
           dod_done?: never
@@ -546,6 +801,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_delivery_rating_competency_id_fkey"
+            columns: ["delivery_rating_competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
             referencedColumns: ["id"]
           },
           {
