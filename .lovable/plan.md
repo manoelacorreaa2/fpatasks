@@ -125,6 +125,7 @@ Leitura/escrita via `createServerFn` em `src/lib/feedbacks.functions.ts` com `re
 Frontend:
 
 - `src/lib/feedbacks.ts` — médias, séries mensais, tendência, agregação do radar, extração de pontos recorrentes
+- `src/components/task-modal.tsx` — nota de entrega no bloco pós-task
 - `src/components/feedback-form.tsx` — painel de registro
 - `src/components/feedback-history.tsx` — lista + expandir
 - `src/components/competency-radar.tsx`, `src/components/trend-badge.tsx`
