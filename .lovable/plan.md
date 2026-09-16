@@ -22,7 +22,22 @@ Escala 1–5: 1 muito abaixo · 2 abaixo · 3 dentro do esperado · 4 acima · 5
 
 Sem periodicidade obrigatória: registra quando houver algo relevante.
 
-## 2. Competências
+## 2. Nota rápida dentro de cada tarefa
+
+No bloco pós-task da tarefa (junto de retrabalho / intervenção / autonomia), um campo único de avaliação da entrega:
+
+- 1 muito abaixo do esperado · 2 abaixo · 3 dentro do esperado · 4 acima · 5 destaque
+- opcional, um comentário curto de uma linha
+- opcional, marcar a qual competência aquela entrega se refere (padrão: Qualidade das entregas)
+
+Essas notas por tarefa entram no painel da pessoa como uma fonte separada, ao lado dos feedbacks formais:
+
+- média das notas de entrega por mês, no mesmo gráfico de evolução (linha própria)
+- aparecem na timeline ("12/03 — Fechamento mensal: acima do esperado")
+- listadas na tela de preparação do 1:1 com o título da tarefa como evidência concreta
+- nunca sobrescrevem nem substituem o feedback formal; ficam identificadas como "nota de entrega"
+
+## 3. Competências
 
 Cadastro inicial com as 12 categorias pedidas (qualidade das entregas, prazos, autonomia, proatividade, comunicação, trabalho em equipe, resolução de problemas, conhecimento técnico, organização, ownership, desenvolvimento contínuo, liderança). Uma tela em Admin permite adicionar, renomear, reordenar, ativar e desativar competências. Desativar nunca apaga notas antigas.
 
