@@ -117,6 +117,7 @@ Banco (novas tabelas, todas com RLS restrita a admins; `service_role` liberado):
 - `job_levels` — `title`, `level`, `is_active`
 - `job_level_expectations` — `job_level_id`, `competency_id`, `expected_score`
 - `profiles` ganha `job_level_id` (nullable)
+- `tasks` ganha `delivery_rating` (1–5, validado por trigger), `delivery_rating_note` e `delivery_rating_competency_id`; a view `tasks_with_score` passa a expor esses campos e o trigger de clone de recorrência não os copia
 - seeds literais das 12 competências e da escala 1–5 na própria migração
 
 Leitura/escrita via `createServerFn` em `src/lib/feedbacks.functions.ts` com `requireSupabaseAuth`, checando papel admin através de `has_role` antes de qualquer retorno; nada de client direto nessas tabelas.
