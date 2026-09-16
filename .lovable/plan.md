@@ -22,15 +22,30 @@ Escala 1–5: 1 muito abaixo · 2 abaixo · 3 dentro do esperado · 4 acima · 5
 
 Sem periodicidade obrigatória: registra quando houver algo relevante.
 
-## 2. Competências
+## 2. Nota rápida dentro de cada tarefa
+
+No bloco pós-task da tarefa (junto de retrabalho / intervenção / autonomia), um campo único de avaliação da entrega:
+
+- 1 muito abaixo do esperado · 2 abaixo · 3 dentro do esperado · 4 acima · 5 destaque
+- opcional, um comentário curto de uma linha
+- opcional, marcar a qual competência aquela entrega se refere (padrão: Qualidade das entregas)
+
+Essas notas por tarefa entram no painel da pessoa como uma fonte separada, ao lado dos feedbacks formais:
+
+- média das notas de entrega por mês, no mesmo gráfico de evolução (linha própria)
+- aparecem na timeline ("12/03 — Fechamento mensal: acima do esperado")
+- listadas na tela de preparação do 1:1 com o título da tarefa como evidência concreta
+- nunca sobrescrevem nem substituem o feedback formal; ficam identificadas como "nota de entrega"
+
+## 3. Competências
 
 Cadastro inicial com as 12 categorias pedidas (qualidade das entregas, prazos, autonomia, proatividade, comunicação, trabalho em equipe, resolução de problemas, conhecimento técnico, organização, ownership, desenvolvimento contínuo, liderança). Uma tela em Admin permite adicionar, renomear, reordenar, ativar e desativar competências. Desativar nunca apaga notas antigas.
 
-## 3. Histórico
+## 4. Histórico
 
 Feedback é sempre um novo registro — nada é sobrescrito. Cada um guarda data, avaliador e conteúdo. A lista mostra do mais recente ao mais antigo, expansível para ver notas e comentários. Editar um feedback é possível (autor ou admin) e fica registrado como alterado; excluir só o autor/admin.
 
-## 4. Evolução Profissional (no perfil da pessoa)
+## 5. Evolução Profissional (no perfil da pessoa)
 
 Nova aba dentro da página da pessoa, com filtro de período (3 / 6 / 12 meses / tudo):
 
@@ -40,7 +55,7 @@ Nova aba dentro da página da pessoa, com filtro de período (3 / 6 / 12 meses /
 - **Radar de competências** — situação atual sobreposta ao período anterior.
 - **Tendência** — ↑ Evoluindo · → Estável · ↓ Atenção. Só aparece com histórico suficiente; caso contrário, "Dados insuficientes para calcular tendência."
 
-## 5. Visão consolidada com o TRM
+## 6. Visão consolidada com o TRM
 
 Bloco no topo da aba juntando os dois eixos, sem misturá-los numa nota única:
 
@@ -49,7 +64,7 @@ Bloco no topo da aba juntando os dois eixos, sem misturá-los numa nota única:
 - Competências com maior evolução
 - Competências que precisam de desenvolvimento
 
-## 6. Histórico de Evolução (timeline)
+## 7. Histórico de Evolução (timeline)
 
 Linha do tempo única, em ordem cronológica, misturando:
 
@@ -58,7 +73,7 @@ Linha do tempo única, em ordem cronológica, misturando:
 - mudanças de nível de delegação
 - entregas concluídas relevantes (com impacto registrado)
 
-## 7. Evolução de Carreira (nova página)
+## 8. Evolução de Carreira (nova página)
 
 Página própria, com seletor de pessoa e de período (3 / 6 / 12 meses / todo o histórico), consolidando numa visão executiva:
 
@@ -72,7 +87,7 @@ Página própria, com seletor de pessoa e de período (3 / 6 / 12 meses / todo o
 
 Nenhuma classificação automática de "pronto" / "não pronto".
 
-## 8. Cargos e expectativas
+## 9. Cargos e expectativas
 
 Cadastro simples em Admin: cargo, nível e nota esperada por competência (ex.: Analista Pleno — Autonomia 4, Comunicação 4, Técnico 4, Ownership 4). Cada pessoa pode ser associada a um cargo. A comparação é descritiva: mostra atual, esperado e a diferença.
 
@@ -102,6 +117,7 @@ Banco (novas tabelas, todas com RLS restrita a admins; `service_role` liberado):
 - `job_levels` — `title`, `level`, `is_active`
 - `job_level_expectations` — `job_level_id`, `competency_id`, `expected_score`
 - `profiles` ganha `job_level_id` (nullable)
+- `tasks` ganha `delivery_rating` (1–5, validado por trigger), `delivery_rating_note` e `delivery_rating_competency_id`; a view `tasks_with_score` passa a expor esses campos e o trigger de clone de recorrência não os copia
 - seeds literais das 12 competências e da escala 1–5 na própria migração
 
 Leitura/escrita via `createServerFn` em `src/lib/feedbacks.functions.ts` com `requireSupabaseAuth`, checando papel admin através de `has_role` antes de qualquer retorno; nada de client direto nessas tabelas.
@@ -109,6 +125,7 @@ Leitura/escrita via `createServerFn` em `src/lib/feedbacks.functions.ts` com `re
 Frontend:
 
 - `src/lib/feedbacks.ts` — médias, séries mensais, tendência, agregação do radar, extração de pontos recorrentes
+- `src/components/task-modal.tsx` — nota de entrega no bloco pós-task
 - `src/components/feedback-form.tsx` — painel de registro
 - `src/components/feedback-history.tsx` — lista + expandir
 - `src/components/competency-radar.tsx`, `src/components/trend-badge.tsx`
