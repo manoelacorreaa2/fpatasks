@@ -32,7 +32,7 @@ export interface FeedbackRecord {
   evidence: string | null;
   strengths: string | null;
   development_points: string | null;
-  next_action: string | null
+  next_action: string | null;
   created_at: string;
   updated_at: string;
   scores: FeedbackScore[];

@@ -75,16 +75,6 @@ function PersonPage() {
 
   const name = profileQ.data?.full_name || profileQ.data?.email || "—";
 
-  if (dossierQ.isError) {
-    return (
-      <div className="p-6">
-        <h1 className="text-lg font-semibold">Evolução profissional</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Esta área é restrita a gestores. {(dossierQ.error as Error).message}
-        </p>
-      </div>
-    );
-  }
 
   const d = dossierQ.data;
   const competencies = d?.competencies ?? [];
@@ -112,6 +102,17 @@ function PersonPage() {
   const compName = (id: string) => competencies.find((c) => c.id === id)?.name ?? "—";
 
   const avgPeriod = (dd: number) => avg(inPeriod(points, dd).map((p) => p.score));
+
+  if (dossierQ.isError) {
+    return (
+      <div className="p-6">
+        <h1 className="text-lg font-semibold">Evolução profissional</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Esta área é restrita a gestores. {(dossierQ.error as Error).message}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5 p-6">

@@ -31,6 +31,8 @@ import {
   type Style,
   type Trm,
 } from "@/lib/development";
+import { listCompetencies } from "@/lib/feedbacks.functions";
+import { SCALE_FALLBACK } from "@/lib/feedbacks";
 import type { Database } from "@/integrations/supabase/types";
 
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
@@ -78,6 +80,9 @@ const empty = (assigneeId: string, currentUserId: string): TaskInsert => ({
   rework: null,
   manager_intervention: null,
   perceived_autonomy: null,
+  delivery_rating: null,
+  delivery_rating_note: null,
+  delivery_rating_competency_id: null,
 });
 
 export function TaskModal({ open, onClose, task, assigneeId, currentUserId, profiles, isAdmin = false, initial = null }: Props) {
@@ -122,6 +127,18 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
   });
 
   const history = historyQ.data ?? [];
+
+  /** Nota de entrega: só o gestor avalia, e só em tarefa de outra pessoa. */
+  const canRateDelivery = isAdmin && form.assignee_id !== currentUserId;
+  const competenciesFn = useServerFn(listCompetencies);
+  const competenciesQ = useQuery({
+    queryKey: ["competencies"],
+    enabled: open && canRateDelivery,
+    queryFn: () => competenciesFn(),
+    retry: false,
+  });
+  const competencies = (competenciesQ.data ?? []).filter((c) => c.is_active);
+
   const suggestions = useMemo(
     () => devSuggestions(history.filter((t) => t.id !== task?.id), form.trm as Trm | null),
     [history, form.trm, task?.id],
@@ -503,6 +520,42 @@ export function TaskModal({ open, onClose, task, assigneeId, currentUserId, prof
               />
               <p className="mt-1 text-[10px] text-muted-foreground">1 = precisou de muito apoio · 5 = totalmente autônomo</p>
             </Field>
+            {canRateDelivery && (
+              <>
+                <Field label="Avaliação da entrega (opcional)" full>
+                  <ToggleRow
+                    options={SCALE_FALLBACK.map((l) => ({ value: l.value, label: String(l.value) }))}
+                    value={form.delivery_rating ?? null}
+                    onChange={(v) => set("delivery_rating", v)}
+                  />
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    {SCALE_FALLBACK.map((l) => `${l.value} ${l.label.toLowerCase()}`).join(" · ")}
+                  </p>
+                </Field>
+                {form.delivery_rating != null && (
+                  <>
+                    <Field label="Comentário curto">
+                      <Input
+                        value={form.delivery_rating_note ?? ""}
+                        onChange={(e) => set("delivery_rating_note", e.target.value || null)}
+                        placeholder="Uma linha…"
+                      />
+                    </Field>
+                    <Field label="Competência avaliada">
+                      <Select
+                        value={form.delivery_rating_competency_id ?? ""}
+                        onValueChange={(v) => set("delivery_rating_competency_id", v || null)}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Qualidade das entregas" /></SelectTrigger>
+                        <SelectContent>
+                          {competencies.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </>
+                )}
+              </>
+            )}
           </Section>
         )}
 
