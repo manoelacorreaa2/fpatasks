@@ -16,9 +16,12 @@ import { Route as AuthenticatedOverviewRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMetodologiaRouteImport } from './routes/_authenticated/metodologia'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedDesenvolvimentoRouteImport } from './routes/_authenticated/desenvolvimento'
+import { Route as AuthenticatedCarreiraRouteImport } from './routes/_authenticated/carreira'
 import { Route as AuthenticatedTasksUserIdRouteImport } from './routes/_authenticated/tasks.$userId'
 import { Route as AuthenticatedPessoaUserIdRouteImport } from './routes/_authenticated/pessoa.$userId'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
+import { Route as AuthenticatedAdminCompetenciasRouteImport } from './routes/_authenticated/admin.competencias'
+import { Route as AuthenticatedAdminCargosRouteImport } from './routes/_authenticated/admin.cargos'
 import { Route as ApiPublicSnapshotsRunRouteImport } from './routes/api/public/snapshots/run'
 
 const AuthRoute = AuthRouteImport.update({
@@ -57,6 +60,11 @@ const AuthenticatedDesenvolvimentoRoute =
     path: '/desenvolvimento',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCarreiraRoute = AuthenticatedCarreiraRouteImport.update({
+  id: '/carreira',
+  path: '/carreira',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTasksUserIdRoute =
   AuthenticatedTasksUserIdRouteImport.update({
     id: '/tasks/$userId',
@@ -75,6 +83,18 @@ const AuthenticatedAdminMembersRoute =
     path: '/admin/members',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminCompetenciasRoute =
+  AuthenticatedAdminCompetenciasRouteImport.update({
+    id: '/admin/competencias',
+    path: '/admin/competencias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminCargosRoute =
+  AuthenticatedAdminCargosRouteImport.update({
+    id: '/admin/cargos',
+    path: '/admin/cargos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
   id: '/api/public/snapshots/run',
   path: '/api/public/snapshots/run',
@@ -84,10 +104,13 @@ const ApiPublicSnapshotsRunRoute = ApiPublicSnapshotsRunRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/carreira': typeof AuthenticatedCarreiraRoute
   '/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/metodologia': typeof AuthenticatedMetodologiaRoute
   '/overview': typeof AuthenticatedOverviewRoute
+  '/admin/cargos': typeof AuthenticatedAdminCargosRoute
+  '/admin/competencias': typeof AuthenticatedAdminCompetenciasRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/pessoa/$userId': typeof AuthenticatedPessoaUserIdRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -96,10 +119,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/carreira': typeof AuthenticatedCarreiraRoute
   '/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/metodologia': typeof AuthenticatedMetodologiaRoute
   '/overview': typeof AuthenticatedOverviewRoute
+  '/admin/cargos': typeof AuthenticatedAdminCargosRoute
+  '/admin/competencias': typeof AuthenticatedAdminCompetenciasRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/pessoa/$userId': typeof AuthenticatedPessoaUserIdRoute
   '/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -110,10 +136,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/carreira': typeof AuthenticatedCarreiraRoute
   '/_authenticated/desenvolvimento': typeof AuthenticatedDesenvolvimentoRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/metodologia': typeof AuthenticatedMetodologiaRoute
   '/_authenticated/overview': typeof AuthenticatedOverviewRoute
+  '/_authenticated/admin/cargos': typeof AuthenticatedAdminCargosRoute
+  '/_authenticated/admin/competencias': typeof AuthenticatedAdminCompetenciasRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/pessoa/$userId': typeof AuthenticatedPessoaUserIdRoute
   '/_authenticated/tasks/$userId': typeof AuthenticatedTasksUserIdRoute
@@ -124,10 +153,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/carreira'
     | '/desenvolvimento'
     | '/historico'
     | '/metodologia'
     | '/overview'
+    | '/admin/cargos'
+    | '/admin/competencias'
     | '/admin/members'
     | '/pessoa/$userId'
     | '/tasks/$userId'
@@ -136,10 +168,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/carreira'
     | '/desenvolvimento'
     | '/historico'
     | '/metodologia'
     | '/overview'
+    | '/admin/cargos'
+    | '/admin/competencias'
     | '/admin/members'
     | '/pessoa/$userId'
     | '/tasks/$userId'
@@ -149,10 +184,13 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/carreira'
     | '/_authenticated/desenvolvimento'
     | '/_authenticated/historico'
     | '/_authenticated/metodologia'
     | '/_authenticated/overview'
+    | '/_authenticated/admin/cargos'
+    | '/_authenticated/admin/competencias'
     | '/_authenticated/admin/members'
     | '/_authenticated/pessoa/$userId'
     | '/_authenticated/tasks/$userId'
@@ -217,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDesenvolvimentoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/carreira': {
+      id: '/_authenticated/carreira'
+      path: '/carreira'
+      fullPath: '/carreira'
+      preLoaderRoute: typeof AuthenticatedCarreiraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tasks/$userId': {
       id: '/_authenticated/tasks/$userId'
       path: '/tasks/$userId'
@@ -238,6 +283,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMembersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/competencias': {
+      id: '/_authenticated/admin/competencias'
+      path: '/admin/competencias'
+      fullPath: '/admin/competencias'
+      preLoaderRoute: typeof AuthenticatedAdminCompetenciasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/cargos': {
+      id: '/_authenticated/admin/cargos'
+      path: '/admin/cargos'
+      fullPath: '/admin/cargos'
+      preLoaderRoute: typeof AuthenticatedAdminCargosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/snapshots/run': {
       id: '/api/public/snapshots/run'
       path: '/api/public/snapshots/run'
@@ -249,20 +308,26 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCarreiraRoute: typeof AuthenticatedCarreiraRoute
   AuthenticatedDesenvolvimentoRoute: typeof AuthenticatedDesenvolvimentoRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedMetodologiaRoute: typeof AuthenticatedMetodologiaRoute
   AuthenticatedOverviewRoute: typeof AuthenticatedOverviewRoute
+  AuthenticatedAdminCargosRoute: typeof AuthenticatedAdminCargosRoute
+  AuthenticatedAdminCompetenciasRoute: typeof AuthenticatedAdminCompetenciasRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
   AuthenticatedPessoaUserIdRoute: typeof AuthenticatedPessoaUserIdRoute
   AuthenticatedTasksUserIdRoute: typeof AuthenticatedTasksUserIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCarreiraRoute: AuthenticatedCarreiraRoute,
   AuthenticatedDesenvolvimentoRoute: AuthenticatedDesenvolvimentoRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedMetodologiaRoute: AuthenticatedMetodologiaRoute,
   AuthenticatedOverviewRoute: AuthenticatedOverviewRoute,
+  AuthenticatedAdminCargosRoute: AuthenticatedAdminCargosRoute,
+  AuthenticatedAdminCompetenciasRoute: AuthenticatedAdminCompetenciasRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
   AuthenticatedPessoaUserIdRoute: AuthenticatedPessoaUserIdRoute,
   AuthenticatedTasksUserIdRoute: AuthenticatedTasksUserIdRoute,
