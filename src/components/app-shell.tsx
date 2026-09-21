@@ -71,18 +71,31 @@ export function AppShell({ children }: { children: ReactNode }) {
           {navItem("/desenvolvimento", "Desenvolvimento", TrendingUp, pathname === "/desenvolvimento")}
           {navItem("/metodologia", "Metodologia", BookOpen, pathname === "/metodologia")}
           <div className="mt-3 px-3 text-xs uppercase tracking-wide text-muted-foreground">Equipe</div>
-          {profiles.map((p) =>
-            navItem(
-              `/tasks/${p.id}`,
-              p.full_name || p.email,
-              Users,
-              pathname === `/tasks/${p.id}`,
-            ),
-          )}
+          {profiles.map((p) => (
+            <div key={p.id}>
+              {navItem(`/tasks/${p.id}`, p.full_name || p.email, Users, pathname === `/tasks/${p.id}`)}
+              {isAdmin && p.id !== user?.id && (
+                <Link
+                  to="/pessoa/$userId"
+                  params={{ userId: p.id }}
+                  className={`ml-9 flex items-center gap-2 rounded-md px-3 py-1 text-xs transition-colors ${
+                    pathname === `/pessoa/${p.id}` ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <LineChart className="h-3 w-3" />
+                  Evolução
+                </Link>
+              )}
+            </div>
+          ))}
           {isAdmin && (
             <>
+              <div className="mt-3 px-3 text-xs uppercase tracking-wide text-muted-foreground">Gestão</div>
+              {navItem("/carreira", "Evolução de carreira", Award, pathname === "/carreira")}
               <div className="mt-3 px-3 text-xs uppercase tracking-wide text-muted-foreground">Admin</div>
               {navItem("/admin/members", "Membros", Shield, pathname === "/admin/members")}
+              {navItem("/admin/competencias", "Competências", Target, pathname === "/admin/competencias")}
+              {navItem("/admin/cargos", "Cargos", Briefcase, pathname === "/admin/cargos")}
             </>
           )}
         </nav>
