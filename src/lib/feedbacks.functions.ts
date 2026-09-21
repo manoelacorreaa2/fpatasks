@@ -362,7 +362,14 @@ export const setProfileJobLevel = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertAdmin(supabase, userId);
-    const { error } = await supabase.from("profiles").update({ job_level_id: data.jobLevelId }).eq("id", data.profileId);
+    // RLS on profiles only allows self-updates, so admins assign job levels through the admin client.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: updated, error } = await supabaseAdmin
+      .from("profiles")
+      .update({ job_level_id: data.jobLevelId })
+      .eq("id", data.profileId)
+      .select("id");
     if (error) throw new Error(error.message);
+    if (!updated?.length) throw new Error("Pessoa não encontrada");
     return { ok: true };
   });
